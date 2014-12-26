@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="location_frequence">
+        <item >5s</item>
+        <item >10s</item>
+        <item >20s</item>
+        <item >40s</item>
+        <item >60s</item>
+    </string-array>
+    
+    <string-array name="report_frequence">
+        <item >15m</item>
+        <item >30m</item>
+        <item >60m</item>
+    </string-array>
+    
+</resources>

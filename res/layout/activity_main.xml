@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sctek.tracker.MainActivity" >
+    
+    <LinearLayout 
+        android:id="@+id/bottom_lout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:background="@color/deepskyblue" >
+        
+        <ImageButton 
+	        android:id="@+id/new_device_ibt"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="@dimen/d5"
+	        android:paddingRight="@dimen/d5"
+	        android:background="@drawable/image_button_selector"
+	        android:src="@drawable/new_device_ic"/>
+        
+    </LinearLayout>
+    
+    <ListView
+	     android:id="@+id/device_listview"
+	     android:layout_width="match_parent"
+	     android:layout_height="wrap_content"
+	     android:layout_marginBottom="50dp"
+	     android:divider="@color/deepskyblue"
+	     android:dividerHeight="@dimen/d1"
+	     android:listSelector="@color/aliceblue" />
+    
+    <include 
+        android:id="@+id/wait_lout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/d5"
+        android:layout_above="@id/bottom_lout"
+        layout="@layout/loading_process_dialog_anim"
+        android:visibility="gone"/>
+    
+
+</RelativeLayout>

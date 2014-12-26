@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView 
+        android:id="@+id/password_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/d20"
+        android:layout_marginRight="@dimen/d20"
+        android:text="@string/input_devicenum"/>
+    
+    <EditText 
+        android:id="@+id/device_num_et"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d30"
+        android:layout_marginLeft="@dimen/d20"
+        android:layout_marginRight="@dimen/d20"
+        android:layout_marginTop="@dimen/d5"
+        android:inputType="number"
+        android:paddingLeft="2dp"
+        android:background="@drawable/bordershape"/>
+
+</LinearLayout>

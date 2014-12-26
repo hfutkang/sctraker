@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp" xmlns:app="http://schemas.android.com/apk/res/com.sctek.tracker">
+    
+	    <com.sctek.tracker.CircleImageView
+	        android:id="@+id/device_lable"
+	        android:layout_width="@dimen/d65"
+	        android:layout_height="@dimen/d65"
+	        android:src="@drawable/targetposition"
+	        app:border_width="1dp"
+	        app:border_color="@color/water"
+	        android:layout_alignParentLeft="true"
+	        android:layout_centerVertical="true"/>
+	    
+	    <LinearLayout 
+	        android:id="@+id/infor_layout"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content" 
+	        android:orientation="vertical"
+	        android:layout_marginLeft="@dimen/d10"
+	        android:layout_toRightOf="@id/device_lable">
+	        
+	        <RelativeLayout 
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content">
+	            
+		    <TextView 
+		        android:id="@+id/device_name"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:layout_centerVertical="true"
+		        android:textColor="@color/deepskyblue"/>
+		    
+		    <ImageView 
+		        android:id="@+id/refresh_iv"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/refresh_selector"
+		        android:layout_alignParentRight="true"
+		        android:layout_centerVertical="true"
+		        android:clickable="true"/>
+		    
+		    <ImageView android:id="@+id/battery"
+		        android:layout_height="wrap_content"
+		        android:layout_width="wrap_content"
+		        android:layout_toLeftOf="@id/refresh_iv"
+		        android:layout_marginRight="10dp"
+		        android:layout_centerVertical="true"/>
+		    
+		    </RelativeLayout>
+		    
+	        <LinearLayout 
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal">
+	            
+		       <TextView android:layout_width="wrap_content"
+		           android:layout_height="wrap_content"
+		           android:textSize="@dimen/d12"
+		           android:text="@string/serial_number"/>
+			    
+			    <TextView 
+			        android:id="@+id/device_id_num"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:textSize="@dimen/d12"/>
+		    
+		     </LinearLayout>
+		     
+	        <LinearLayout 
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal">
+			    
+			    <TextView 
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:textSize="@dimen/d12"
+			        android:text="@string/master"/>
+			    
+	            <TextView 
+			        android:id="@+id/master_num"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content" 
+			        android:textSize="@dimen/d12"/>
+	            
+	        </LinearLayout>
+	        
+	        <LinearLayout 
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content">
+	        
+		        <TextView android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textSize="@dimen/d12"
+		            android:text="@string/last_position"/>
+		        
+		        <TextView 
+		            android:id="@+id/position_tv"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:textSize="@dimen/d12"/>
+		        
+	        </LinearLayout>
+	    
+	    </LinearLayout>	
+	    
+</RelativeLayout>

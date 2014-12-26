@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/start_real_location_item"
+        android:title="@string/start_real_location"/>
+     <item
+        android:id="@+id/real_location_item"
+        android:title="@string/real_location"/>
+    <item
+        android:id="@+id/history_location_item"
+        android:title="@string/history_trace"/>
+    <item
+        android:id="@+id/setting"
+        android:title="@string/set_title"/>
+
+</menu>

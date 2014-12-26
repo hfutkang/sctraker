@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView 
+        android:id="@+id/bind_title_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/d20"
+        android:layout_marginTop="@dimen/d10"
+        android:text="@string/bind_title"/>
+    
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1"
+        android:background="@color/deepskyblue"
+        android:layout_marginTop="@dimen/d10"
+        android:layout_marginBottom="@dimen/d10"/>
+    
+    <TextView 
+        android:id="@+id/bind_hint1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/d20"
+        android:layout_marginRight="@dimen/d20"/>
+    <TextView 
+        android:id="@+id/bind_master"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/d20"
+        android:layout_marginRight="@dimen/d20"/>
+     <TextView 
+        android:id="@+id/bind_hint2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/d20"
+        android:layout_marginRight="@dimen/d20"/>
+    
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1"
+        android:background="@color/gainsboro"
+        android:layout_marginTop="@dimen/d10"/>
+    
+    <TextView 
+        android:id="@+id/bind_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity = "center_horizontal"
+        android:paddingTop="@dimen/d10"
+        android:paddingBottom="@dimen/d10"
+        android:textStyle="italic"
+        android:textSize="@dimen/d16"
+        android:background="@drawable/textview_selector"/>
+
+</LinearLayout>

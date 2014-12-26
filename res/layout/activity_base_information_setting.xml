@@ -1,0 +1,130 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.sctek.tracker.NewDeviceActivity" 
+    xmlns:app="http://schemas.android.com/apk/res/com.sctek.tracker">
+    
+    <RelativeLayout 
+        android:id="@+id/device_lable_layout_b"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/d50">
+        
+        <TextView 
+            android:id="@+id/select_lable_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_marginLeft="@dimen/d10"
+            android:text="@string/device_lable"/>
+         
+        <LinearLayout 
+            android:id="@+id/select_image_layout_b"
+            android:layout_width="@dimen/d80"
+            android:layout_height="@dimen/d80"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:background="@drawable/bordershape">
+            
+        <com.sctek.tracker.CircleImageView 
+           android:id="@+id/device_lable_b"
+           android:layout_width="wrap_content"
+           android:layout_height="0dp"
+           android:layout_marginLeft="@dimen/d5"
+           android:layout_marginRight="@dimen/d5"
+           android:layout_marginTop="@dimen/d5"
+           android:layout_weight="1"
+           app:border_width="1dp"
+           app:border_color="@color/water"
+           android:layout_gravity="center_horizontal"
+           android:src="@drawable/ic_postition_marker" />
+       
+        <TextView 
+           android:id="@+id/select_image_tv_b"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:textSize="@dimen/d10"
+           android:gravity="center_horizontal"
+           android:layout_gravity="bottom"
+           android:hint="@string/click_to_selete"/>
+       
+        </LinearLayout>    
+        
+    </RelativeLayout>
+    
+    <LinearLayout 
+        android:id="@+id/device_name_layout_b"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d20"
+        android:layout_below="@id/device_lable_layout_b">
+        
+        <TextView 
+            android:id="@+id/device_name_tv_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/device_name"
+            android:layout_marginLeft="@dimen/d10"/>
+        
+        <EditText 
+            android:id="@+id/device_name_et_b"
+            android:layout_width="@dimen/d200"
+            android:layout_height="@dimen/d35"
+            android:background="@drawable/bordershape"
+            android:layout_marginLeft="@dimen/d10"
+            android:inputType="textPersonName"
+            android:paddingLeft="2dp"/>
+        
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:id="@+id/device_num_layout_b"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d20"
+        android:layout_below="@id/device_name_layout_b">
+        
+        <TextView 
+            android:id="@+id/device_num_tv_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/device_num"
+            android:layout_marginLeft="@dimen/d10"/>
+        
+        <EditText 
+            android:id="@+id/device_num_et_b"
+            android:layout_width="@dimen/d200"
+            android:layout_height="@dimen/d35"
+            android:background="@drawable/bordershape"
+            android:layout_marginLeft="@dimen/d10"
+            android:inputType="numberSigned"
+            android:paddingLeft="2dp"/>
+        
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:id="@+id/bottom_lout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:background="@color/deepskyblue" >
+        
+        <Button 
+	        android:id="@+id/save_bt"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="@dimen/d5"
+	        android:paddingRight="@dimen/d5"
+	        android:background="@drawable/image_button_selector"
+	        android:text="@string/save"
+	        android:textColor="@color/white"
+	        android:textStyle="bold"
+	        android:textSize="@dimen/d20"/>
+        
+    </LinearLayout>
+    
+</RelativeLayout>
