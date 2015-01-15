@@ -40,6 +40,7 @@ public class NewDeviceActivity extends Activity {
 	
 	private String dirPath;
 	private String initialized;
+	private String password;
 	
 	private String imageName;
 	private String imagePath;
@@ -108,6 +109,7 @@ public class NewDeviceActivity extends Activity {
 		imagePath = dirPath + "/" + imageName + ".png";
 		Intent intent = getIntent();
 		initialized = intent.getStringExtra("initialized");
+		password = intent.getStringExtra("pw");
 		
 		lableIv = (ImageView)findViewById(R.id.device_lable_n);
 		nameEt = (EditText)findViewById(R.id.device_name_et_n);
@@ -174,10 +176,14 @@ public class NewDeviceActivity extends Activity {
 					resultIntent.putExtra("imagepath", imagePath);
 					resultIntent.putExtra("pw", pw);
 				}
-				else {
+				else if(pw.equals(password)){
 					resultIntent.putExtra("name", name);
 					resultIntent.putExtra("imagepath", imagePath);
-					resultIntent.putExtra("pw", pw);
+				}
+				else {
+					Toast.makeText(NewDeviceActivity.this, 
+							R.string.password_incorrect, Toast.LENGTH_SHORT).show();
+					return;
 				}
 				setResult(RESULT_OK, resultIntent);
 				finish();

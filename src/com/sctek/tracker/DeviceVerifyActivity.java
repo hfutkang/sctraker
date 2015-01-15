@@ -32,6 +32,8 @@ public class DeviceVerifyActivity extends Activity {
 	
 	private static final String QR_LABLE = "sctracker:";
 	
+	private String id;
+	
 	private ImageButton scanBt;
 	private Button verifyBt;
 	private EditText idEt;
@@ -117,20 +119,14 @@ public class DeviceVerifyActivity extends Activity {
 			switch (v.getId()){
 					
 				case R.id.device_verify_bt:
-					String id = idEt.getText().toString();
-//					Intent intent1 = new Intent();
-//					intent1.putExtra("id", id);
-//					intent1.putExtra("master", "13322222221");
-//					intent1.putExtra("initialized", "false");
-//					setResult(RESULT_OK, intent1);
-//					finish();
+					 id = idEt.getText().toString();
 //					Log.e(TAG, "" + getVerifyNum(id).length());
-//					if(id.length()!=11||!isNumeric(id)
-//							||!id.endsWith(getVerifyNum(id))) {
-//						Toast.makeText(DeviceVerifyActivity.this, 
-//								R.string.illegalid, Toast.LENGTH_SHORT).show();
-//						return;
-//					}
+					if(id.length()!=11||!isNumeric(id)
+							||!id.endsWith(getVerifyNum(id))) {
+						Toast.makeText(DeviceVerifyActivity.this, 
+								R.string.illegalid, Toast.LENGTH_SHORT).show();
+						return;
+					}
 					if(mApplication.searchDevice(id) >= 0) {
 						Toast.makeText(DeviceVerifyActivity.this, 
 								R.string.device_exist, Toast.LENGTH_SHORT).show();
@@ -189,10 +185,11 @@ public class DeviceVerifyActivity extends Activity {
 						R.string.connection_error_verify, Toast.LENGTH_SHORT).show();
 			}
 			else if(msg.what == Constant.EMPTY_DATA) {
-				waitView.setVisibility(View.GONE);
-				idEt.setEnabled(true);
-				scanBt.setEnabled(true);
-				verifyBt.setEnabled(true);
+				Intent intent = new Intent();
+				intent.putExtra("id", id);
+				intent.putExtra("initialized", "0");
+				setResult(RESULT_OK, intent);
+				finish();
 			}
 		}
 	};

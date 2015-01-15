@@ -64,6 +64,8 @@ public class LocationActivity extends Activity {
 	private final int SETTING_REQUEST_CODE = 1;
 	private final int[] locationFrequences = {5, 10, 20, 40, 60};
 	
+	private final static long TIME_OUT_PERIOD = 2*60*1000;
+	
 	private String deviceId;
 	private String time;
 	private int locateFre;
@@ -107,8 +109,6 @@ public class LocationActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.e(TAG, "onCreate");
-		
-		SDKInitializer.initialize(this);
 		setContentView(R.layout.activity_location);
 		
 		ActionBar actionBar = this.getActionBar();
@@ -209,13 +209,13 @@ public class LocationActivity extends Activity {
 	
 	public void recycleElement() {
 		
-		bdMap.onDestroy();
+		//bdMap.onDestroy();
 		geoCoder.destroy();
 		positions.clear();
 		
 		mApplication = null;
 		positions = null;
-		bdMap = null;
+		//bdMap = null;
 		servicemanager = null;
 		waitingDialog = null;
 		tTask = null;
@@ -500,7 +500,7 @@ public class LocationActivity extends Activity {
 						SmsTimeRunnable runnable = 
 								new SmsTimeRunnable(handler, 
 										deviceNum, Constant.STOP_REAL_LOCATE);
-						handler.postDelayed(runnable, 10000);
+						handler.postDelayed(runnable, TIME_OUT_PERIOD);
 						
 						mApplication.addRunnble(runnable);
 						SharedPreferences.Editor editor = sPref.edit();
@@ -514,7 +514,7 @@ public class LocationActivity extends Activity {
 					if(reallocating) 
 						locationPlaybt.setImageResource(R.drawable.play_button_selector);
 					else
-						historyPlaybt.setImageResource(R.drawable.pause_button_selector);
+						historyPlaybt.setImageResource(R.drawable.play_button_selector);
 					historylocating = false;
 					Intent intent = new Intent(LocationActivity.this
 							, SettingActivity.class);
@@ -574,7 +574,7 @@ public class LocationActivity extends Activity {
 				SmsTimeRunnable runnable = 
 						new SmsTimeRunnable(handler, 
 								dNum, Constant.START_REAL_LOCATE);
-				handler.postDelayed(runnable, 10000);
+				handler.postDelayed(runnable, TIME_OUT_PERIOD);
 				
 				mApplication.addRunnble(runnable);
 				

@@ -38,6 +38,8 @@ public class SettingActivity extends Activity {
 	private final int[] reportFrequences = {15, 30, 60};
 	private final int BASE_SETREQUEST_CODE = 2;
 	
+	private final static long TIME_OUT_PERIOD = 2*60*1000;
+	
 	private int reportFrequence;
 	
 	private String deviceId;
@@ -212,7 +214,7 @@ public class SettingActivity extends Activity {
 				if(isFrequenceChanged()) {
 					SmsUtils.setFrequence(dNum, reportFrequence, 
 							mApplication.getPassword(deviceId));
-					addRunnable(Constant.FREQUENCY_SET, dNum, 20000);
+					addRunnable(Constant.FREQUENCY_SET, dNum, TIME_OUT_PERIOD);
 					
 					SharedPreferences.Editor editor = sharepreferences.edit();
 					editor.putBoolean(deviceId + "freqwaiting", true);
@@ -312,7 +314,7 @@ public void showDeviceNumDialog() {
 				editor = sharepreferences.edit();
 				editor.putString(deviceId + "rebinding", dNum);
 				editor.commit();
-				addRunnable(Constant.REBIND, dNum, 20000);
+				addRunnable(Constant.REBIND, dNum, TIME_OUT_PERIOD);
 				dialog.dismiss();
 			}
 		});
@@ -386,7 +388,7 @@ public void showDeviceNumDialog() {
 						return;
 					SmsUtils.sendModifyPwMessage(deviceNum, 
 							newPw, mApplication.getPassword(deviceId));
-					addRunnable(Constant.NEW_PASSWORD, deviceNum, 10000);
+					addRunnable(Constant.NEW_PASSWORD, deviceNum, TIME_OUT_PERIOD);
 					
 					SharedPreferences.Editor editor = sharepreferences.edit();
 					editor.putString(deviceId + "pwwaiting", newPw);
@@ -464,7 +466,7 @@ public void showDeviceNumDialog() {
 		dd.masterNum = state;
 	}
 	
-	public void addRunnable(int cmd, String dNum, int delay) {
+	public void addRunnable(int cmd, String dNum, long delay) {
 		
 		SmsTimeRunnable runnable = 
 				new SmsTimeRunnable(handler, dNum, cmd);

@@ -145,6 +145,10 @@ public class XmlContentHandler extends DefaultHandler {
 				httpRes.power = Integer.parseInt(power)*100;
 				nodeName = "";
 			}
+			else if(nodeName.equals("master")) {
+				httpRes.master = new String(ch, start, length);
+				nodeName = "";
+			}
 		}
 	}
 	
@@ -169,6 +173,7 @@ public class XmlContentHandler extends DefaultHandler {
 		public String time;
 		public String clientid;
 		public int power;
+		public String master;
 		
 	}
 	

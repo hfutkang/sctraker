@@ -151,7 +151,7 @@ public class DeviceListViewAdapter extends BaseAdapter{
 			holder.lable.setImageDrawable(drawable);
 		}
 		else
-			holder.lable.setImageResource(R.drawable.targetposition);
+			holder.lable.setImageResource(R.drawable.ic_postition_marker);
 		
 		return convertView;
 	}

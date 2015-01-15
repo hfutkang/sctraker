@@ -44,7 +44,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <!-- 来电消音 s4OYTr55hAxDOIarThRfHSGt -->
+    <!-- 来电消音 s4OYTr55hAxDOIarThRfHSGt Dk1PIx2MklZpqGz3PvkUXGXX-->
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" >
     </uses-permission>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -64,11 +64,12 @@
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="Dk1PIx2MklZpqGz3PvkUXGXX" />
+            android:value="s4OYTr55hAxDOIarThRfHSGt" />
 
         <activity
             android:name=".TrackerStartActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -77,7 +78,8 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" >
         </activity>
 
         <provider
@@ -98,23 +100,28 @@
 
         <activity
             android:name=".LocationActivity"
-            android:label="@string/title_activity_location" >
+            android:label="@string/title_activity_location"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".NewDeviceActivity"
-            android:label="@string/title_activity_new_device" >
+            android:label="@string/title_activity_new_device"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".BaseInformationSettingActivity"
-            android:label="@string/title_activity_base_information_setting" >
+            android:label="@string/title_activity_base_information_setting"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".SettingActivity"
-            android:label="@string/title_activity_setting" >
+            android:label="@string/title_activity_setting"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".WarningActivity"
-            android:label="@string/title_activity_warning" >
+            android:label="@string/title_activity_warning"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".zxing.CaptureActivity"
@@ -124,7 +131,8 @@
         <activity
             android:name=".DeviceVerifyActivity"
             android:label="@string/title_activity_device_verify" 
-            android:theme="@android:style/Theme.Light.NoTitleBar">
+            android:theme="@android:style/Theme.Light.NoTitleBar"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

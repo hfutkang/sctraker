@@ -20,7 +20,7 @@
     <string name="adddevice_timeout">等待超时，添加失败</string>
     <string name="adddevice_fail">添加设备失败</string>
     <string name="verify_fail">验证失败</string>
-    <string name="password_incorrect">密码错误，添加设备失败</string>
+    <string name="password_incorrect">密码错误</string>
     <string name="query_time_error">请重新选择查询时段</string>
     <string name="trace">足迹</string>
     <string name="real_location">实时位置</string>
@@ -125,6 +125,11 @@
     <string name="title_activity_warning">WarningActivity</string>
     <string name="scan_qrcode">将二维码放入框内，即可自动扫描</string>
     <string name="illegal_qrcode">非法的二维码</string>
+    <string name="new_edition">版本更新</string>
+    <string name="updatenow">现在更新</string>
+    <string name="updatelater">以后再说</string>
+    <string name="download_notification_title">追踪器</string>
+    <string name="update_fail">新版本下载失败，请重新选择更新</string>
     <string name="title_activity_device_verify">DeviceVerifyActivity</string>
 
 </resources>

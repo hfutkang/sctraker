@@ -133,7 +133,7 @@ public class HttpLocateService extends Service{
 			timer = null;
 		}
 		
-		return START_STICKY;
+		return START_NOT_STICKY;
 	}
 	
 	@Override
@@ -194,7 +194,7 @@ public class HttpLocateService extends Service{
 				}
 				else {
 					Log.e(TAG, result);
-					if(result.contains("null"))
+					if(result.contains("null")||result.length() == 0)
 						handler.sendEmptyMessage(Constant.EMPTY_DATA);
 					else if(result.contains("tracer"))
 						sendCommandMessage(result);
@@ -312,10 +312,11 @@ public class HttpLocateService extends Service{
 				
 				List<HttpResData> points = xmlHandler.getHttpRes();
 				
-				for(int i = 0; points!=null&&i<points.size(); i++) {
+				for(int i = 0; i<points.size(); i++) {
 					Log.e(TAG,"" + i);
 					HttpResData hr = points.get(i);
 					String clientNum = hr.clientid;
+					String master = hr.master;
 					String time = hr.time;
 					double longtitude = hr.longtitude;
 					double latitude =hr.latitude;
@@ -327,6 +328,7 @@ public class HttpLocateService extends Service{
 					bundle.putDouble("longitude", longtitude);
 					bundle.putDouble("laitude", latitude);
 					bundle.putInt("power", power);
+					bundle.putString("master", master);
 					
 					Message msg = handler.obtainMessage();
 					msg.what = type;

@@ -8,7 +8,7 @@
 	        android:id="@+id/device_lable"
 	        android:layout_width="@dimen/d65"
 	        android:layout_height="@dimen/d65"
-	        android:src="@drawable/targetposition"
+	        android:src="@drawable/ic_postition_marker"
 	        app:border_width="1dp"
 	        app:border_color="@color/water"
 	        android:layout_alignParentLeft="true"

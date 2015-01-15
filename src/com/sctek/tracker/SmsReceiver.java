@@ -122,7 +122,7 @@ public class SmsReceiver extends BroadcastReceiver {
 					
 					else if(msgBody.contains("powerstatus")) {	
 						String id = mApplication.getDeviceId(deviceNum);
-						Log.e(TAG, "id");
+						Log.e(TAG, id);
 						if(id.length() != 0) {
 							addNotification(context, id, xmlHandler.getSmsRes().command);
 							addWarnMessage(context, id,
@@ -389,7 +389,7 @@ public class SmsReceiver extends BroadcastReceiver {
         // This line is needed to make this intent compare differently than the other intents
         // created here for other messages. Without this line, the PendingIntent always gets the
         // intent of a previous message and notification.
-        //di.setType(Integer.toString(notificationId));
+        di.setType(Integer.toString(notificationId));
         di.setClass(context, WarningActivity.class);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, di, 0);

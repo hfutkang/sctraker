@@ -90,10 +90,12 @@ public class WarningActivity extends Activity {
 	public void cancelNotification() {
 		Intent intent = getIntent();
 		Bundle extras = intent.getExtras();
+		Log.e(TAG, "id1:" + intent.getIntExtra("id", 0));
         if (extras == null) {
             return;
         }
 		int id = extras.getInt("id");
+		Log.e(TAG, "id:" + id);
 		NotificationManager notificationManager =
 	            (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);     
 	   notificationManager.cancel(id);

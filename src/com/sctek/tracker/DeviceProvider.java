@@ -79,7 +79,7 @@ public class DeviceProvider extends ContentProvider {
 					queryBuilder.setTables(DeviceTableData.TABLE_NAME_W);
 					queryBuilder.appendWhere(DeviceTableData._ID + "="
 							+ uri.getPathSegments().get(1));
-					
+					break;
 				default:
 					throw new IllegalArgumentException("Unknow URI " + uri);
 			
@@ -173,13 +173,13 @@ public class DeviceProvider extends ContentProvider {
 				case THE_WHOLE_WARNING_TABLE_URI:
 					count = database.delete(DeviceTableData.TABLE_NAME_W,
 							selection, selectionArgs);
-					
+					break;
 				case SINGLE_WARNING_URI:
 					String rowId1 = uri.getPathSegments().get(1);
 					count = database.delete(DeviceTableData.TABLE_NAME_W,
 							DeviceTableData._ID + "=" + rowId1 + (!TextUtils.isEmpty(selection)?
 									"AND (" + selection + ')' : ""), selectionArgs);
-						
+					break;
 				default:
 					throw new IllegalArgumentException("Unkown URI" + uri);
 		}
@@ -216,13 +216,13 @@ public class DeviceProvider extends ContentProvider {
 				case THE_WHOLE_WARNING_TABLE_URI:
 					count = database.update(DeviceTableData.TABLE_NAME_W,
 							values, selection, selectionArgs);
-					
+					break;
 				case SINGLE_WARNING_URI:
 					String rowId1 = uri.getPathSegments().get(1);
 					count = database.update(DeviceTableData.TABLE_NAME_W,
 							values, DeviceTableData._ID + "=" + rowId1 + (!TextUtils.isEmpty(selection) ? 
 									"AND (" + selection + ')' : ""), selectionArgs);
-					
+					break;
 				default:
 					throw new IllegalArgumentException("Unkonw Uri" + uri);
 		}

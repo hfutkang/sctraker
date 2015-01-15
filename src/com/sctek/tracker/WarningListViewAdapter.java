@@ -63,10 +63,15 @@ public class WarningListViewAdapter extends BaseAdapter{
 			switch (wInfo.type) {
 			case Constant.EMERGENCY:
 				warn.setText(R.string.emergency);
+				break;
 			case Constant.LOW_POWER_WARNING:
 				warn.setText(R.string.low_power);
+				break;
 			case Constant.UNBINDED:
 				warn.setText(R.string.master_unbind);
+				break;
+			default:
+				break;
 			}
 			
 			holder = new Holder();
@@ -151,7 +156,7 @@ public class WarningListViewAdapter extends BaseAdapter{
 		ContentResolver contentResolver = 
 				context.getContentResolver();
 		contentResolver.delete(DeviceTableData.CONTENT_URI_W,
-				DeviceTableData.DEVICE_SIM_NUMBER + "=?", new String[]{wi.sim});
+				DeviceTableData.TIME + "=?", new String[]{wi.time});
 		wList.remove(pos);
 	}
 

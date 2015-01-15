@@ -42,6 +42,8 @@ public class MainActivity extends Activity {
 	private final int LOCATE_REQUEST_CODE = 2;
 	private static final int DEVICE_INFORMATION_REQUEST = 3;
 	
+	private final static long TIME_OUT_PERIOD = 2*60*1000;
+	
 	private TrackerApplication mApplication;
 	private DeviceListViewAdapter lvAdapter;
 	private ArrayList<DeviceListViewData> lvD;
@@ -64,7 +66,6 @@ public class MainActivity extends Activity {
 		Log.e(TAG, "onCreate");
 		
 		setContentView(R.layout.activity_main);
-		SDKInitializer.initialize(getApplicationContext());
 		
 		ActionBar actionBar = this.getActionBar();
 		if(actionBar != null) {
@@ -97,7 +98,6 @@ public class MainActivity extends Activity {
 		super.onResume();
 		servicemanager.attachHandler(handler);
 		Log.e(TAG, "onResume");
-		
 	}
 	
 	@Override
@@ -147,21 +147,24 @@ public class MainActivity extends Activity {
 			String pw = bundle.getString("pw");
 			
 			if(newDevice.isMaster.equals("true")) {
-//				SmsUtils.sendBindMessage(newDevice.deviceNum, 
-//						newDevice.deviceId, newDevice.pw);
-//				SmsTimeRunnable runnable = 
-//						new SmsTimeRunnable(handler
-//								, newDevice.deviceNum, Constant.BIND);
-//				handler.postDelayed(runnable, 30000);
-//				
-//				mApplication.addRunnble(runnable);
+				SmsUtils.sendBindMessage(newDevice.deviceNum, 
+						newDevice.deviceId, pw);
+				SmsTimeRunnable runnable = 
+						new SmsTimeRunnable(handler
+								, newDevice.deviceNum, Constant.BIND);
+				handler.postDelayed(runnable, TIME_OUT_PERIOD);
+				
+				mApplication.addRunnble(runnable);
 				SharedPreferences.Editor editor = hasNumberPref.edit();
 				editor.putBoolean(newDevice.deviceNum, true);
 				editor.commit();
 				
-//				newDevice.pw = pw; 
-				mApplication.addNewDevice(newDevice);
-				lvAdapter.notifyDataSetChanged();
+				newDevice.pw = pw; 
+				
+				waitView.setVisibility(View.VISIBLE);
+				newDeviceBt.setEnabled(false);
+//				mApplication.addNewDevice(newDevice);
+//				lvAdapter.notifyDataSetChanged();
 				
 			}
 			else {
@@ -169,18 +172,10 @@ public class MainActivity extends Activity {
 //				intent.putExtra("type", Constant.VERIFY_REQ);
 //				intent.putExtra("id", newDevice.deviceId);
 //				startService(intent);
-				if(newDevice.pw.equals(pw)) {
-					mApplication.addNewDevice(newDevice);
-					lvAdapter.notifyDataSetChanged();
-				}
-				else
-					Toast.makeText(MainActivity.this, 
-							R.string.password_incorrect, Toast.LENGTH_SHORT).show();
-					
+				mApplication.addNewDevice(newDevice);
+				lvAdapter.notifyDataSetChanged();
 			}
-//			
-//			waitView.setVisibility(View.VISIBLE);
-//			newDeviceBt.setClickable(false);
+			
 		}
 		else if(requestCode == LOCATE_REQUEST_CODE
 				&&resultCode == RESULT_OK)
@@ -196,6 +191,7 @@ public class MainActivity extends Activity {
 			Intent intent = new Intent(MainActivity.this, NewDeviceActivity.class);
 			intent.putExtra("initialized", bundle.getString("initialized"));
 			intent.putExtra("count", lvAdapter.getCount());
+			intent.putExtra("pw", newDevice.pw);
 			startActivityForResult(intent, DEVICE_INFORMATION_REQUEST);
 		}
 		
@@ -379,7 +375,7 @@ public class MainActivity extends Activity {
 						
 					case Constant.BIND:
 						waitView.setVisibility(View.GONE);
-						newDeviceBt.setClickable(true);
+						newDeviceBt.setEnabled(true);
 						Toast.makeText(MainActivity.this
 								, R.string.adddevice_timeout, Toast.LENGTH_SHORT).show();
 						mApplication.removeRunnable(
@@ -398,11 +394,11 @@ public class MainActivity extends Activity {
 					mApplication.addNewDevice(newDevice);
 					lvAdapter.notifyDataSetChanged();
 					waitView.setVisibility(View.GONE);
-					newDeviceBt.setClickable(true);
+					newDeviceBt.setEnabled(true);
 				}
 				else {
 					waitView.setVisibility(View.GONE);
-					newDeviceBt.setClickable(true);
+					newDeviceBt.setEnabled(true);
 					Toast.makeText(MainActivity.this
 							, R.string.adddevice_fail, Toast.LENGTH_SHORT).show();
 				}
@@ -410,7 +406,7 @@ public class MainActivity extends Activity {
 			else if(msg.what == Constant.VERIFY_REQ_ERROR) {
 				
 				waitView.setVisibility(View.GONE);
-				newDeviceBt.setClickable(true);
+				newDeviceBt.setEnabled(true);
 				Toast.makeText(MainActivity.this
 						, R.string.connection_error_add, Toast.LENGTH_SHORT).show();
 			}
@@ -419,19 +415,18 @@ public class MainActivity extends Activity {
 				Bundle bundle = msg.getData();
 				String masterNum = bundle.getString("masternum");
 				
-				newDevice.isMaster = "true";
 				newDevice.masterNum = masterNum;
 				mApplication.addNewDevice(newDevice);
 				lvAdapter.notifyDataSetChanged();
 				waitView.setVisibility(View.GONE);
-				newDeviceBt.setClickable(true);
+				newDeviceBt.setEnabled(true);
 				
 			}
 			else if(msg.what == Constant.BIND_FAIL_MSG) {
 				Bundle bundle = msg.getData();
 				String deviceNum = bundle.getString("devicenum");
 				waitView.setVisibility(View.GONE);
-				newDeviceBt.setClickable(true);
+				newDeviceBt.setEnabled(true);
 				Toast.makeText(MainActivity.this
 						, R.string.verify_fail, Toast.LENGTH_SHORT).show();
 				SharedPreferences.Editor editor = hasNumberPref.edit();
@@ -441,6 +436,7 @@ public class MainActivity extends Activity {
 			else if(msg.what == Constant.LAST_POSITION) {
 				Bundle bundle = msg.getData();
 				String deviceId = bundle.getString("clientnum");
+				String master = bundle.getString("master");
 				String time = bundle.getString("time");
 				double lat = bundle.getDouble("laitude");
 				double longt = bundle.getDouble("longitude");
@@ -452,17 +448,21 @@ public class MainActivity extends Activity {
 					return;
 				DeviceListViewData device = lvD.get(i);
 				device.power = power/5;
+				if(!device.masterNum.equals(master)) {
+					device.masterNum = master;
+					mApplication.updateDevice(deviceId);
+				}
 				LatLng ll = new LatLng(lat, longt);
 				CoordinateConverter cc = new CoordinateConverter();
 				cc.from(CoordType.GPS);
 				cc.coord(ll);
 				ll = cc.convert();
-//				LatLng llll = new LatLng(22.5460540000, 114.0259740000);
 				GeoCoder geoCoder = GeoCoder.newInstance();
 				geoCoder.setOnGetGeoCodeResultListener(
 						new GeoCoderListener(device, geoCoder, lvAdapter));
-				geoCoder.reverseGeoCode(new ReverseGeoCodeOption().
-						location(ll));
+				if(geoCoder.reverseGeoCode(new ReverseGeoCodeOption().
+						location(ll)))
+				Log.e(TAG, "" + ll.latitude + " " + ll.longitude);
 			}
 			else if(msg.what == Constant.LAST_POSITION_FAIL
 					||msg.what == Constant.EMPTY_DATA) {

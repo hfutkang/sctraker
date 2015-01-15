@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.baidu.mapapi.SDKInitializer;
 import com.sctek.tracker.DeviceProvideData.DeviceTableData;
 
 import android.app.Activity;
@@ -31,10 +32,12 @@ public class TrackerApplication extends Application {
 		// TODO Auto-generated method stub
 		Log.e(TAG, "onCreate");
 		super.onCreate();
-		
+		SDKInitializer.initialize(this);
 		deviceList = new ArrayList<DeviceListViewData>();
 		runnableMap = new HashMap<String, SmsTimeRunnable>();
 		contentResolver = getContentResolver();
+		
+		loadDeviceList();
 		notificationId = 0;
 	}
 	
