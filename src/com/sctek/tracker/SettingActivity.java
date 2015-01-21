@@ -7,14 +7,20 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +43,9 @@ public class SettingActivity extends Activity {
 	private final String[] items = {"基本信息", "主控绑定", "频率设置","密码设置"};
 	private final int[] reportFrequences = {15, 30, 60};
 	private final int BASE_SETREQUEST_CODE = 2;
+	
+	private final String SMS_SEND_ACTION = "SMS_SEND_ACTION";
+	private final String SMS_DELIVERED_ACTION= "SMS_DEVLIVERED_ACTION";
 	
 	private final static long TIME_OUT_PERIOD = 2*60*1000;
 	
@@ -78,6 +87,10 @@ public class SettingActivity extends Activity {
 		}
 		
 		init();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(SMS_DELIVERED_ACTION);
+		filter.addAction(SMS_SEND_ACTION);
+		registerReceiver(mBroadcastReceiver, filter);
 	}
 	
 	@Override
@@ -91,6 +104,7 @@ public class SettingActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		bindDialog = null;
+		unregisterReceiver(mBroadcastReceiver);
 		super.onDestroy();
 		Log.e(TAG, "onDestory");
 	}
@@ -172,7 +186,7 @@ public class SettingActivity extends Activity {
 			return;
 		}
 		
-		if(sharepreferences.getBoolean("freqwaiting", false)) {
+		if(sharepreferences.getBoolean(deviceId + "freqwaiting", false)) {
 			Toast.makeText(this
 					, R.string.waiting, Toast.LENGTH_SHORT).show();
 			return;
@@ -211,14 +225,18 @@ public class SettingActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
-				if(isFrequenceChanged()) {
+				if(isFrequenceChanged()&&isSimAvailable()) {
+					PendingIntent spi = PendingIntent.getBroadcast(SettingActivity.this, 
+							0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+					PendingIntent dpi = PendingIntent.getBroadcast(SettingActivity.this, 
+							0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
 					SmsUtils.setFrequence(dNum, reportFrequence, 
-							mApplication.getPassword(deviceId));
-					addRunnable(Constant.FREQUENCY_SET, dNum, TIME_OUT_PERIOD);
-					
-					SharedPreferences.Editor editor = sharepreferences.edit();
-					editor.putBoolean(deviceId + "freqwaiting", true);
-					editor.commit();
+							mApplication.getPassword(deviceId), spi,dpi);
+//					addRunnable(Constant.FREQUENCY_SET, dNum, TIME_OUT_PERIOD);
+//					
+//					SharedPreferences.Editor editor = sharepreferences.edit();
+//					editor.putBoolean(deviceId + "freqwaiting", true);
+//					editor.commit();
 					
 				}
 			}
@@ -269,17 +287,24 @@ public class SettingActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				
 				String dNum = mApplication.isMaster(deviceId);
-				if(dNum.equals("false"))
+				if(dNum.equals("false")) {
 					showDeviceNumDialog();
-//				else {
-//					SmsUtils.sendRebindMessage(dNum, 
-//							mApplication.getPassword(deviceId));
-//					SharedPreferences.Editor editor = sharepreferences.edit();
-//					editor.putString(deviceId + "rebinding", dNum);
-//					editor.commit();
-//					addRunnable(Constant.REBIND, dNum, 20000);
-//				}
+				}
+				else if(isSimAvailable()){
+					
+					PendingIntent spi = PendingIntent.getBroadcast(SettingActivity.this, 
+							0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+					PendingIntent dpi = PendingIntent.getBroadcast(SettingActivity.this, 
+							0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
+					SmsUtils.sendRebindMessage(dNum, 
+							mApplication.getPassword(deviceId), spi, dpi);
+					SharedPreferences.Editor editor = sharepreferences.edit();
+					editor.putString(deviceId + "rebinding", dNum);
+					editor.commit();
+					addRunnable(Constant.REBIND, dNum, 20000);
+				} 
 				bindDialog.cancel();
 			}
 		});
@@ -304,8 +329,14 @@ public void showDeviceNumDialog() {
 							R.string.device_num_empty, Toast.LENGTH_SHORT).show();
 					return;
 				}
+				if(!isSimAvailable())
+					return;
+				PendingIntent sendPi = PendingIntent.getBroadcast(SettingActivity.this, 
+						0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+				PendingIntent deliveredPi = PendingIntent.getBroadcast(SettingActivity.this, 
+						0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
 				SmsUtils.sendRebindMessage(dNum, 
-						mApplication.getPassword(deviceId));
+						mApplication.getPassword(deviceId), sendPi, deliveredPi);
 				SharedPreferences sPref = getSharedPreferences("hasnumber", 
 						Activity.MODE_PRIVATE);
 				SharedPreferences.Editor editor = sPref.edit();
@@ -386,8 +417,12 @@ public void showDeviceNumDialog() {
 				if(isMaster) {
 					if(!isLegal(newPw, confirmPw))
 						return;
+					PendingIntent spi = PendingIntent.getBroadcast(SettingActivity.this, 
+							0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+					PendingIntent dpi = PendingIntent.getBroadcast(SettingActivity.this, 
+							0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
 					SmsUtils.sendModifyPwMessage(deviceNum, 
-							newPw, mApplication.getPassword(deviceId));
+							newPw, mApplication.getPassword(deviceId), spi, dpi);
 					addRunnable(Constant.NEW_PASSWORD, deviceNum, TIME_OUT_PERIOD);
 					
 					SharedPreferences.Editor editor = sharepreferences.edit();
@@ -413,6 +448,14 @@ public void showDeviceNumDialog() {
 		passwordDialog.show();
 	}
 	
+	protected boolean isSimAvailable() {
+		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+		if(tm.getSimState() != TelephonyManager.SIM_STATE_READY) {
+			Toast.makeText(this, R.string.sim_exception, Toast.LENGTH_SHORT).show();
+			return false;
+		}
+		return true;
+	}
 	private boolean isLegal(String pw, String confirmPw) {
 		if(pw.length()!=6) {
 			Toast.makeText(this, R.string.input_six_password, 
@@ -630,6 +673,40 @@ public void showDeviceNumDialog() {
 				else
 					Toast.makeText(SettingActivity.this, 
 							R.string.modify_pw_fail, Toast.LENGTH_SHORT).show();
+			}
+		}
+	};
+	
+	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+			if(SMS_SEND_ACTION.equals(intent.getAction())) {
+				switch(getResultCode()) {
+				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+					Log.e(TAG, "SEND:" + "RESULT_ERROR_GENERIC_FAILURE");
+					break;
+				case Activity.RESULT_OK:
+					Log.e(TAG, "SEND:" + "RESULT_OK");
+					break;
+				default:
+					Log.e(TAG, "SEND:" + "fail");
+					break;
+				}
+			}
+			if(SMS_DELIVERED_ACTION.equals(intent.getAction())) {
+				switch(getResultCode()) {
+				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+					Log.e(TAG, "DELIVERE:" + "RESULT_ERROR_GENERIC_FAILURE");
+					break;
+				case Activity.RESULT_OK:
+					Log.e(TAG, "DELIVERE:" + "RESULT_OK");
+					break;
+				default:
+					Log.e(TAG, "DELIVERE:" + "fail");
+					break;
+				}
 			}
 		}
 	};

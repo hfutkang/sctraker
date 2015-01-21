@@ -33,6 +33,7 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" /> 
     <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CAMERA" >
@@ -64,8 +65,7 @@
         android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="s4OYTr55hAxDOIarThRfHSGt" />
-
+            android:value="Dk1PIx2MklZpqGz3PvkUXGXX" />
         <activity
             android:name=".TrackerStartActivity"
             android:theme="@android:style/Theme.NoTitleBar"
@@ -90,7 +90,8 @@
         <receiver android:name=".SmsReceiver" >
             <intent-filter android:priority="2147483647" >
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-
+               <!--  <action android:name="SMS_SEND_ACTION"/>
+                <action android:name="SMS_DEVLIVERED_ACTION" /> -->
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>

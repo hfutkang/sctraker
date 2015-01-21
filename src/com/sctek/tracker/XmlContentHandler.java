@@ -98,8 +98,8 @@ public class XmlContentHandler extends DefaultHandler {
 				nodeName = "";
 			}
 			else if(nodeName.equals("time")) {
-				smsRes.time =new String(ch, start, length);
-//				httpRes.time = parseTime(new String(ch, start, length));
+//				smsRes.time =new String(ch, start, length);
+				httpRes.time = parseTime(new String(ch, start, length));
 				nodeName = "";
 			}
 			else if(nodeName.equals("master")) {
@@ -132,8 +132,8 @@ public class XmlContentHandler extends DefaultHandler {
 				nodeName = "";
 			}
 			else if(nodeName.equals("time")) {
-				httpRes.time =new String(ch, start, length);
-//				httpRes.time = parseTime(new String(ch, start, length));
+//				httpRes.time =new String(ch, start, length);
+				httpRes.time = parseTime(new String(ch, start, length));
 				nodeName = "";
 			}
 			else if(nodeName.equals("id")) {
@@ -142,7 +142,7 @@ public class XmlContentHandler extends DefaultHandler {
 			}
 			else if(nodeName.equals("bat")) {
 				String power = new String(ch, start, length);
-				httpRes.power = Integer.parseInt(power)*100;
+				httpRes.power = Integer.parseInt(power);
 				nodeName = "";
 			}
 			else if(nodeName.equals("master")) {

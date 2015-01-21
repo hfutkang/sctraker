@@ -251,7 +251,7 @@ public class DeviceListViewAdapter extends BaseAdapter{
 			id = R.drawable.battery_71;
 		else if(power <= 85)
 			id = R.drawable.battery_85;
-		else if(power <= 100)
+		else 
 			id = R.drawable.battery_100;
 		return id;
 	}

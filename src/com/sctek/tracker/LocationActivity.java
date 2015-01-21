@@ -34,6 +34,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,6 +66,9 @@ public class LocationActivity extends Activity {
 	private final int[] locationFrequences = {5, 10, 20, 40, 60};
 	
 	private final static long TIME_OUT_PERIOD = 2*60*1000;
+	
+	private final String SMS_SEND_ACTION = "SMS_SEND_ACTION";
+	private final String SMS_DELIVERED_ACTION= "SMS_DEVLIVERED_ACTION";
 	
 	private String deviceId;
 	private String time;
@@ -465,8 +469,8 @@ public class LocationActivity extends Activity {
 			item.setTitle(R.string.stop_real_location);
 		else 
 			item.setTitle(R.string.start_real_location);
-		if((locate_waiting))
-			item.setEnabled(false);
+//		if((locate_waiting))
+//			item.setEnabled(false);
 		
 		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			
@@ -496,15 +500,19 @@ public class LocationActivity extends Activity {
 						SharedPreferences sPref = 
 								getSharedPreferences("devicestate", Activity.MODE_PRIVATE);
 						locateFre = sPref.getInt(deviceId + "lfrequence", 20);
-						SmsUtils.stopLocation(deviceNum, pw, locateFre);
-						SmsTimeRunnable runnable = 
-								new SmsTimeRunnable(handler, 
-										deviceNum, Constant.STOP_REAL_LOCATE);
-						handler.postDelayed(runnable, TIME_OUT_PERIOD);
-						
-						mApplication.addRunnble(runnable);
+						PendingIntent spi = PendingIntent.getBroadcast(LocationActivity.this, 
+								0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+						PendingIntent dpi = PendingIntent.getBroadcast(LocationActivity.this, 
+								0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
+						SmsUtils.stopLocation(deviceNum, pw, locateFre, spi, dpi);
+//						SmsTimeRunnable runnable = 
+//								new SmsTimeRunnable(handler, 
+//										deviceNum, Constant.STOP_REAL_LOCATE);
+//						handler.postDelayed(runnable, TIME_OUT_PERIOD);
+//						
+//						mApplication.addRunnble(runnable);
 						SharedPreferences.Editor editor = sPref.edit();
-						editor.putBoolean(deviceId + "locwaiting", true);
+						editor.putBoolean(deviceId + "locating", false);
 						editor.commit();
 					}
 					popup.dismiss();
@@ -570,16 +578,20 @@ public class LocationActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
-				SmsUtils.startLocation(dNum, locateFre, pw);
-				SmsTimeRunnable runnable = 
-						new SmsTimeRunnable(handler, 
-								dNum, Constant.START_REAL_LOCATE);
-				handler.postDelayed(runnable, TIME_OUT_PERIOD);
-				
-				mApplication.addRunnble(runnable);
+				PendingIntent spi = PendingIntent.getBroadcast(LocationActivity.this, 
+						0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+				PendingIntent dpi = PendingIntent.getBroadcast(LocationActivity.this, 
+						0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
+				SmsUtils.startLocation(dNum, locateFre, pw, spi, dpi);
+//				SmsTimeRunnable runnable = 
+//						new SmsTimeRunnable(handler, 
+//								dNum, Constant.START_REAL_LOCATE);
+//				handler.postDelayed(runnable, TIME_OUT_PERIOD);
+//				
+//				mApplication.addRunnble(runnable);
 				
 				SharedPreferences.Editor editor = sPref.edit();
-				editor.putBoolean(deviceId + "locwaiting", true);
+				editor.putBoolean(deviceId + "locating", true);
 				editor.commit();
 					
 			}

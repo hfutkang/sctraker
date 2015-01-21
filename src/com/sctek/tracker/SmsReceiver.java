@@ -24,9 +24,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Telephony.Sms;
 import android.telephony.SmsMessage;
 import android.util.Log;
 import android.widget.BaseAdapter;
@@ -34,6 +37,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViews.RemoteView;
 import android.widget.Toast;
 
+@SuppressLint("NewApi")
 public class SmsReceiver extends BroadcastReceiver {
 	
 	private static final String TAG = "SmsReceiver";
@@ -50,7 +54,11 @@ public class SmsReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
 		Log.e(TAG, "onReceive");
-		
+//		if(intent.getAction().equals("SMS_SEND_ACTION")
+//				||intent.getAction().equals("SMS_DEVLIVERED_ACTION")) {
+//			Log.e(TAG, "123455");
+//			return;
+//		}
 		mApplication = (TrackerApplication)context.getApplicationContext();
 		//lvData = mApplication.getDeviceList();
 		map = mApplication.getMap();
@@ -63,6 +71,9 @@ public class SmsReceiver extends BroadcastReceiver {
 			
 			smsMessages[n] = SmsMessage.createFromPdu((byte[])messages[n]);
 			deviceNum = smsMessages[n].getDisplayOriginatingAddress();
+			if(deviceNum.startsWith("+86")) {
+				deviceNum = deviceNum.substring(3);
+			}
 			Log.e(TAG, deviceNum);
 			if(mApplication.hasDevice(deviceNum)) {
 				try{
@@ -300,7 +311,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		run.handler.sendMessage(msg);
 		
 		run.handler.removeCallbacks(run);
-		map.remove(deviceNum + Constant.UNBIND);
+		map.remove(deviceNum + Constant.REBIND);
 		
 	}
 	

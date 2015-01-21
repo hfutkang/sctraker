@@ -15,6 +15,8 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
@@ -22,6 +24,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Telephony;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -37,6 +40,9 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	private final String TAG = "MainActivity";
+	
+	private final String SMS_SEND_ACTION = "SMS_SEND_ACTION";
+	private final String SMS_DELIVERED_ACTION= "SMS_DEVLIVERED_ACTION";
 	
 	private final int NEW_DEVICE_REQUEST_CODE = 1;
 	private final int LOCATE_REQUEST_CODE = 2;
@@ -76,7 +82,7 @@ public class MainActivity extends Activity {
 			actionBar.setDisplayShowTitleEnabled(false);
 			
 			actionBar.show();
-		}
+		} 
 		
 		initUiView();
 		initLvClickListener();
@@ -104,6 +110,7 @@ public class MainActivity extends Activity {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+		stopLocation();
 		servicemanager.detachHandler();
 	}
 	
@@ -115,6 +122,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private long backPressedTime;
+	
 	@Override
 	public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
 		if(keyCode == KeyEvent.KEYCODE_BACK 
@@ -147,8 +155,12 @@ public class MainActivity extends Activity {
 			String pw = bundle.getString("pw");
 			
 			if(newDevice.isMaster.equals("true")) {
+				PendingIntent spi = PendingIntent.getBroadcast(MainActivity.this, 
+						0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+				PendingIntent dpi = PendingIntent.getBroadcast(MainActivity.this, 
+						0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
 				SmsUtils.sendBindMessage(newDevice.deviceNum, 
-						newDevice.deviceId, pw);
+						newDevice.deviceId, pw, spi, dpi);
 				SmsTimeRunnable runnable = 
 						new SmsTimeRunnable(handler
 								, newDevice.deviceNum, Constant.BIND);
@@ -196,6 +208,13 @@ public class MainActivity extends Activity {
 		}
 		
 		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	public void stopLocation() {
+		Intent intent =  
+				new Intent(MainActivity.this, HttpLocateService.class);
+		intent.putExtra("type", Constant.STOP_TASK);
+		startService(intent);
 	}
 	
 	public void initUiView() {
@@ -318,7 +337,11 @@ public class MainActivity extends Activity {
 		while(it.hasNext()) {
 			
 			DeviceListViewData dd = it.next();
-			SmsUtils.stateRequest(dd.deviceNum);
+			PendingIntent spi = PendingIntent.getBroadcast(MainActivity.this, 
+					0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+			PendingIntent dpi = PendingIntent.getBroadcast(MainActivity.this, 
+					0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
+			SmsUtils.stateRequest(dd.deviceNum, spi, dpi);
 			
 			SmsTimeRunnable runnable = 
 					new SmsTimeRunnable(handler, dd.deviceNum, Constant.STATE_REQUEST);
@@ -447,11 +470,11 @@ public class MainActivity extends Activity {
 				if(i < 0)
 					return;
 				DeviceListViewData device = lvD.get(i);
-				device.power = power/5;
-				if(!device.masterNum.equals(master)) {
+				device.power = power/42;
+//				if(!device.masterNum.equals(master)) {
 					device.masterNum = master;
 					mApplication.updateDevice(deviceId);
-				}
+//				}
 				LatLng ll = new LatLng(lat, longt);
 				CoordinateConverter cc = new CoordinateConverter();
 				cc.from(CoordType.GPS);

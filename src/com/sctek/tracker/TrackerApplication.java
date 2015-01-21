@@ -205,9 +205,10 @@ public class TrackerApplication extends Application {
 		if(i == -1)
 			return;
 		DeviceListViewData dd = deviceList.get(i);
+		Log.e(TAG, dNum);
 		dd.deviceNum = dNum;
 		ContentValues value = new ContentValues();
-		value.put(DeviceTableData.MASTER_PHONE_NUMBER, dNum);
+		value.put(DeviceTableData.DEVICE_SIM_NUMBER, dNum);
 		Uri updateIdUri = ContentUris
 				.withAppendedId(DeviceTableData.CONTENT_URI_D, dd.id);
 		contentResolver.update(updateIdUri, value, null, null);
@@ -218,6 +219,9 @@ public class TrackerApplication extends Application {
 		if(i == -1)
 			return ;
 		DeviceListViewData dd = deviceList.get(i);
+		if("true".equals(dd.isMaster)&&
+				mNum.equals(dd.masterNum))
+			return;
 		dd.masterNum = mNum;
 		dd.isMaster = isMaster;
 		if(isMaster.equals("false")) {

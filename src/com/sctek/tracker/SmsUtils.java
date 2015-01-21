@@ -1,5 +1,7 @@
 package com.sctek.tracker;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.telephony.SmsManager;
 import android.util.Log;
 
@@ -7,7 +9,9 @@ public class SmsUtils {
 	
 	public final static String TAG = "SmsUtils";
 	
-	public static void stateRequest(String dNum) {
+	public final static String SMS_SEND_ACTION = "sms_send_action";
+	
+	public static void stateRequest(String dNum, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -17,7 +21,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -26,7 +30,7 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void newMonitor(String dNum, String password) {
+	public static void newMonitor(String dNum, String password, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -37,7 +41,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -46,7 +50,7 @@ public class SmsUtils {
 		}
 	}
 
-	public static void setFrequence(String dNum, int reportFrequence, String pw) {
+	public static void setFrequence(String dNum, int reportFrequence, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -58,7 +62,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -67,7 +71,7 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void sendBindMessage(String dNum, String id, String pw) {
+	public static void sendBindMessage(String dNum, String id, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -79,7 +83,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -88,7 +92,7 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void sendUnbindMessage(String dNum) {
+	public static void sendUnbindMessage(String dNum, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -98,7 +102,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -107,7 +111,7 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void sendRebindMessage(String dNum, String pw) {
+	public static void sendRebindMessage(String dNum, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -118,7 +122,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -127,14 +131,14 @@ public class SmsUtils {
 		}
 	}
 	
-	private static void sendSmsMessage( String addr, String msg)throws Exception {
+	private static void sendSmsMessage( String addr, String msg, PendingIntent spi, PendingIntent dpi)throws Exception {
 		
 		SmsManager smsMgr = SmsManager.getDefault();
-		smsMgr.sendTextMessage(addr, null, msg, null, null);
+		smsMgr.sendTextMessage(addr, null, msg, spi, dpi);
 		
 	}
 
-	public static void startLocation(String dNum, int fre, String pw) {
+	public static void startLocation(String dNum, int fre, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -147,7 +151,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -156,7 +160,7 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void stopLocation(String dNum, String pw, int fre) {
+	public static void stopLocation(String dNum, String pw, int fre, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
@@ -169,7 +173,7 @@ public class SmsUtils {
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			
@@ -179,19 +183,19 @@ public class SmsUtils {
 	}
 
 	public static void sendModifyPwMessage(String dNum, String newPw,
-			String pw) {
+			String pw, PendingIntent spi, PendingIntent dpi) {
 
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
-		msgBody.append("<cmd>start</cmd>" + '\n');
+		msgBody.append("<cmd>modifypw</cmd>" + '\n');
 		msgBody.append("<pw>" + newPw + "</pw>" + '\n');
 		msgBody.append("<old>" + pw + "</old>" + '\n');
 		msgBody.append("</tracer>");
 		
 		try {
 			
-			sendSmsMessage(dNum, msgBody.toString());
+			sendSmsMessage(dNum, msgBody.toString(), spi, dpi);
 			
 		} catch (Exception e) {
 			

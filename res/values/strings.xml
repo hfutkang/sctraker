@@ -87,6 +87,7 @@
     <string name="save">保存</string>
     <string name="add">添加</string>
     <string name="bind_title">主控绑定</string>
+    <string name="sim_exception">Sim卡异常，操作失败</string>
     <string name="binded_master">当前主控号码:</string>
     <string name="bind_hint_1">当前已绑定主控号码:</string>
     <string name="bind_hint_2">此操作将会解绑当前主控，绑定你当前手机号码为主控。</string>
