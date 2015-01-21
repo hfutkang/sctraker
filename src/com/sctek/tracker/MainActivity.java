@@ -162,11 +162,11 @@ public class MainActivity extends Activity {
 				SmsUtils.sendBindMessage(newDevice.deviceNum, 
 						newDevice.deviceId, pw, spi, dpi);
 				SmsTimeRunnable runnable = 
-						new SmsTimeRunnable(handler
+						new SmsTimeRunnable(getApplicationContext()
 								, newDevice.deviceNum, Constant.BIND);
 				handler.postDelayed(runnable, TIME_OUT_PERIOD);
 				
-				mApplication.addRunnble(runnable);
+//				mApplication.addRunnble(runnable);
 				SharedPreferences.Editor editor = hasNumberPref.edit();
 				editor.putBoolean(newDevice.deviceNum, true);
 				editor.commit();
@@ -344,10 +344,10 @@ public class MainActivity extends Activity {
 			SmsUtils.stateRequest(dd.deviceNum, spi, dpi);
 			
 			SmsTimeRunnable runnable = 
-					new SmsTimeRunnable(handler, dd.deviceNum, Constant.STATE_REQUEST);
+					new SmsTimeRunnable(getApplicationContext(), dd.deviceNum, Constant.STATE_REQUEST);
 			handler.postDelayed(runnable, 1000);
 			
-			mApplication.addRunnble(runnable);
+//			mApplication.addRunnble(runnable);
 		
 		}
 	}
@@ -434,7 +434,7 @@ public class MainActivity extends Activity {
 						, R.string.connection_error_add, Toast.LENGTH_SHORT).show();
 			}
 			else if(msg.what == Constant.BIND_SUCCESES_MSG) {
-				
+				handler.removeCallbacks(null);
 				Bundle bundle = msg.getData();
 				String masterNum = bundle.getString("masternum");
 				
