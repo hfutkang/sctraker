@@ -12,6 +12,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 import com.sctek.tracker.DeviceProvideData.DeviceTableData;
+import com.sctek.tracker.XmlContentHandler.SmsResData;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -41,8 +42,27 @@ import android.widget.Toast;
 public class SmsReceiver extends BroadcastReceiver {
 	
 	private static final String TAG = "SmsReceiver";
+	
+	private static final String NOTIFICATION_TITLE = "追踪器";
+	
 	private static final String lowPowerNotify = "低电报警，点击查看所有报警信息。";
 	private static final String unbindNotify = "你已被解除设备的主控权限";
+	
+	private static final String BIND_SUCCESS = "绑定成功";
+	private static final String BIND_FAIL = "绑定失败，点击查看详情";
+	private static final String BIND_SUCCESS_BUT_EXIT = "你的手机已成功绑定设备，请重新添加";
+	
+	private static final String REBIND_SUCCESS = "重绑定成功";
+	private static final String REBIND_FAIL ="重绑定失败，点击查看详情";
+	
+	private static final String NEW_PW_SUCCESS = "修改密码成功";
+	private static final String NEW_PW_FAIL = "修改密码失败，点击查看详情";
+	
+	private static final String SET_REGULAR_SUCCESS = "设置定时报告位置频率成功";
+	private static final String SET_REGULAR_FAIL = "设置定时报告位置频率失败，点击查看详情";
+	
+	private static final String START_REAL_LOCATE_SUCCESS = "开启实时定位成功";
+	private static final String START_REAL_LOCATE_FAIL = "开启实时定位失败，点击查看详情";
 	
 	private TrackerApplication mApplication;
 	//private ArrayList<DeviceListViewData> lvData;
@@ -54,14 +74,9 @@ public class SmsReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
 		Log.e(TAG, "onReceive");
-//		if(intent.getAction().equals("SMS_SEND_ACTION")
-//				||intent.getAction().equals("SMS_DEVLIVERED_ACTION")) {
-//			Log.e(TAG, "123455");
-//			return;
-//		}
+		
 		mApplication = (TrackerApplication)context.getApplicationContext();
 		//lvData = mApplication.getDeviceList();
-		map = mApplication.getMap();
 		
 		Bundle bundle = intent.getExtras();
 		Object messages[] = (Object [])bundle.get("pdus");
@@ -75,7 +90,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				deviceNum = deviceNum.substring(3);
 			}
 			Log.e(TAG, deviceNum);
-			if(mApplication.hasDevice(deviceNum)) {
+			if(mApplication.hasNumber(deviceNum)) {
 				try{
 					
 					String msgBody = smsMessages[n].getMessageBody();
@@ -88,71 +103,37 @@ public class SmsReceiver extends BroadcastReceiver {
 					xmlReader.setContentHandler(xmlHandler);
 					xmlReader.parse(new InputSource(stringReader));
 					
-					if(msgBody.contains("stateres")
-							&&(run=map.get(deviceNum + 
-									Constant.STATE_REQUEST))!=null) 
-						sendStateMsg(xmlHandler);
-					
-					else if(msgBody.contains("newmonitorres")
-							&&(run=map.get(deviceNum + 
-									Constant.NEW_MONITOR))!=null)
-						sendNewMonitorMsg(xmlHandler);
-					
-					else if(msgBody.contains("positionres")
-							&&(run=map.get(deviceNum + 
-									Constant.REAL_LOCATION))!=null)
-						sendLocationMsg(xmlHandler);
-					
-					else if(msgBody.contains("regularres")
-							&&(run=map.get(deviceNum + 
-									Constant.FREQUENCY_SET))!=null)
-						sendFrequenceMsg(xmlHandler);
-					
-					else if(msgBody.contains("realres")) {
-						if((run=map.get(deviceNum + 
-									Constant.START_REAL_LOCATE))!=null)
-							sendStartMsg(xmlHandler);
-						else if((run=map.get(deviceNum + 
-									Constant.STOP_REAL_LOCATE))!=null)
-							sendStopMsg(xmlHandler);
-					}
-					else if(msgBody.contains("bindres")
-							&&(run=map.get(deviceNum + 
-									Constant.BIND))!=null)
-						sendBindMsg(xmlHandler);
-					
-					else if(msgBody.contains("unbindres")
-							&&(run=map.get(deviceNum + 
-									Constant.UNBIND))!=null)
-						sendUnBindMsg(xmlHandler);
-					
-					else if(msgBody.contains("rebindres")
-							&&(run=map.get(deviceNum +
-									Constant.REBIND))!=null)
-						sendRebindMsg(xmlHandler);
+					if(msgBody.contains("bindres")) {
+						addBindresNotification(xmlHandler, context);
+						
+					} 
+					else if(msgBody.contains("rebindres"))
+						addRebindNotification(xmlHandler, context);
 					
 					else if(msgBody.contains("powerstatus")) {	
-						String id = mApplication.getDeviceId(deviceNum);
-						Log.e(TAG, id);
-						if(id.length() != 0) {
-							addNotification(context, id, xmlHandler.getSmsRes().command);
-							addWarnMessage(context, id,
-									xmlHandler.getSmsRes().command);
-						}
+						SmsResData d = xmlHandler.getSmsRes();
+						addNotification(context, d.clientid, d.command);
+						addWarnMessage(context, d.clientid, Constant.LOW_POWER_WARNING);
 					}
-					else if(msgBody.contains("modifypwres")
-							&&(run=map.get(deviceNum +
-									Constant.NEW_PASSWORD))!=null)
-						sendNewPwMessage(xmlHandler);
+					else if(msgBody.contains("modifypwres"))
+						addModifyPwNotification(xmlHandler, context);
+					
+					else if(msgBody.contains("regularres"))
+						addRegularresNotification(xmlHandler, context);
+					
+					else if(msgBody.contains("realres"))
+						addRealresNotification(xmlHandler, context);
+					
 					else if(msgBody.contains("unbinded")) {
 						
-						String id = mApplication.getDeviceId(deviceNum);
-						mApplication.resetMaster(id, 
-								xmlHandler.getSmsRes().master, "false");
-						Log.e(TAG, id);
-						addNotification(context, id, xmlHandler.getSmsRes().command);
-						addWarnMessage(context, id,	
-								xmlHandler.getSmsRes().command);
+						String id = xmlHandler.getSmsRes().clientid;
+						String master = xmlHandler.getSmsRes().master;
+
+						if(!master.equals(mApplication.getMaster(id))) {
+							mApplication.resetMaster(id, master, "false");
+							addNotification(context, id, xmlHandler.getSmsRes().command);
+							addWarnMessage(context, id,	Constant.UNBINDED);
+						}
 					}
 					xmlHandler = null;
 					this.abortBroadcast();
@@ -163,138 +144,232 @@ public class SmsReceiver extends BroadcastReceiver {
 			}
 		}
 	}
+	
+	private void addBindresNotification(XmlContentHandler xh, Context context) {
+		Log.e(TAG, "addBindresNotification");
+		SmsResData data = xh.getSmsRes();
+		
+		String result = data.result;
+		String masterNum = data.master;
+		String id = data.clientid;
+		DeviceListViewData dd = mApplication.getWaitDevice(id, deviceNum);
+		
+		Intent intent = new Intent();
+		
+		int wType = -1;
+		
+		String mBody = "";
+		
+		if("success".equals(result)) {
+			
+			wType = Constant.BIND_SUCCESES_MSG;
+			
+			if(dd != null) { 
+				
+				dd.masterNum = masterNum;
+				mApplication.addNewDevice(dd);
+				
+				updateMyNumber(context, masterNum);
+				
+				mBody = new String(BIND_SUCCESS);
+				
+				intent.setAction(Constant.BIND_SUCCESS_ACTION);
+				
+			}
+			else {
+				mBody = new String(BIND_SUCCESS_BUT_EXIT);
+			}
+		}
+		
+		if("already_bind".equals(result)) {
+			mBody = new String(BIND_FAIL);
+			
+			intent.setAction(Constant.BIND_FAIL_ACTION);
+			
+			wType = Constant.ALREADY_BIND;
+			
+		}
+		
+		context.sendBroadcast(intent);
+		
+		mApplication.removeWaitDevice(id);
+        
+        notify(context, mBody, id, wType);
+		
+	}
+	
+	public void addRebindNotification(XmlContentHandler xh, Context context) {
+		
+		SmsResData data = xh.getSmsRes();
+		
+		String result = data.result;
+		String masterNum = data.master;
+		String id = data.clientid;
+		
+		int wType = -1;
+		
+		String mBody = "";
+		
+		if("success".equals(result)) {
+			
+			mApplication.resetMaster(id, masterNum, "true");
+			mApplication.updateDeviceNum(id, deviceNum);
+			
+			updateMyNumber(context, masterNum);
+			
+			wType = Constant.REBIND_SUCCESS_MSG;
+			mBody = new String(REBIND_SUCCESS);
+			
+		}
+		else  {
+			
+			if("no_bind".equals(result))
+				wType = Constant.REBIND_NO_BIND;
+			
+			if("pwd_error".equals(result)) 
+				wType = Constant.REBIND_PWD_ERROR;
+			
+			if("deviceid_error".equals(result))
+				wType = Constant.REBIND_ID_ERROR;
+			
+			mBody = new String(REBIND_FAIL);
+			
+		}
+		
+		notify(context, mBody, id, wType);
+		
+	}
+	
+	public void addModifyPwNotification(XmlContentHandler xh, Context context) {
+		
+		SmsResData data = xh.getSmsRes();
+		
+		String result = data.result;
+		String id = data.clientid;
+		String pw = data.pw;
+		
+		int wType = -1;
+		String mBody = "";
+		
+		if("success".equals(result)) {
+			wType = Constant.NEW_PASSWORD_SUCCESS;
+			mBody = new String(NEW_PW_SUCCESS);
+			mApplication.updatePassword(id, pw);
+		}
+		else {
+			
+			mBody = new String(NEW_PW_FAIL);
+			
+			if("no_bind".equals(result))
+				wType = Constant.NEW_PASSWORD_NO_BIND;
+			if("pwd_error".equals(result))
+				wType = Constant.NEW_PASSWORD_PW_ERROR;
+			if("deviceid_error".equals(result))
+				wType = Constant.NEW_PASSWORD_ID_ERROR;
+			
+		}
+		
+		notify(context, mBody, id, wType);
+	}
+	
+	public void addRegularresNotification(XmlContentHandler xh, Context context) {
+		
+		SmsResData data = xh.getSmsRes();
+		
+		String result = data.result;
+		String id = data.clientid;
+		
+		String mBody = "";
+		int wType = -1;
+		
+		if("success".equals(result)) {
+			wType = Constant.FREQUENCE_SUCCESES_MSG;
+			mBody = new String(SET_REGULAR_SUCCESS);
+		}
+		else {
+			
+			mBody = new String(SET_REGULAR_FAIL);
+			
+			if("no_bind".equals(result))
+				wType = Constant.FREQUENCE_NO_BIND;
+			if("pwd_error".equals(result))
+				wType = Constant.FREQUENCE_PW_ERROR;
+			if("pwd_error".equals(result))
+				wType = Constant.FREQUENCE_ID_ERROR;
+			
+		}
+		
+		notify(context, mBody, id, wType);
+	}
+	
+	public void addRealresNotification(XmlContentHandler xh, Context context) {
+		
+		SmsResData data = xh.getSmsRes();
+		
+		String result = data.result;
+		String id = data.clientid;
+		
+		String mBody = "";
+		int wType = -1;
+		
+		SharedPreferences sPref = 
+				context.getSharedPreferences("devicestate", Activity.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sPref.edit();
+		boolean locating = sPref.getBoolean(id + "locating", true);
+		
+		if("success".equals(result)) {
+			wType = Constant.START_REAL_LOCATE_SUCCESS;
+			mBody = new String(START_REAL_LOCATE_SUCCESS);
+		}
+		else {
+			
+			editor.putBoolean(id + "locating", !locating);
+			editor.commit();
+			
+			mBody = new String(START_REAL_LOCATE_FAIL);
+			
+			if("no_bind".equals(result))
+				wType = locating?Constant.START_LOCATE_NO_BIND:Constant.STOP_LOCATE_NO_BIND;
+			if("pwd_error".equals(result))
+				wType = locating?Constant.START_LOCATE_PW_ERROR:Constant.STOP_LOCATE_PW_ERROR;
+			if("deviceid_error".equals(result))
+				wType = locating?Constant.START_LOCATE_ID_ERROR:Constant.STOP_LOCATE_ID_ERROR;
+			
+		}
+		
+		notify(context, mBody, id, wType);
+	}
+	
+	public void notify(Context context, String mBody, String id, int wType) {
+		
+		int notificationId = mApplication.getNextNotificationId();
+		
+		Notification.Builder notification = new Notification.Builder(context)
+        .setWhen(System.currentTimeMillis())
+        .setContentTitle(NOTIFICATION_TITLE)
+        .setContentText(mBody)
+        .setSmallIcon(R.drawable.ic_postition_marker)
+        .setContentIntent(createDisplayMessageIntent(context, notificationId));
+//        .setTicker(id);
 
-	public void sendStateMsg(XmlContentHandler xh) {
-		
-		int power = xh.getSmsRes().power;
-		String master = xh.getSmsRes().master;
-		double longitude = xh.getSmsRes().longtitude;
-		double laitude = xh.getSmsRes().latitude;
-		String time = xh.getSmsRes().time;
-		
-		Message msg = run.handler.obtainMessage();
-		msg.what = Constant.STATE_RES_MSG;
-		
-		Bundle bl = new Bundle();
-		bl.putInt("power", power);
-		bl.putString("master", master);
-		bl.putString("devicenum", deviceNum);
-		bl.putDouble("longitude", longitude);
-		bl.putDouble("laitude", laitude);
-		bl.putString("time", time);
-		
-		msg.setData(bl);
-		run.handler.sendMessage(msg);
-		
-		run.handler.removeCallbacks(run);
-		map.remove(deviceNum + Constant.STATE_REQUEST);
+	    NotificationManager notificationManager =
+	        (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+	    
+	    notificationManager.cancel(notificationId-1);
+	    Notification nf = notification.getNotification();
+	    notificationManager.cancel(notificationId - 1);
+	    notificationManager.notify(notificationId, nf);
+	    
+	    addWarnMessage(context, id, wType);
 	}
 	
-	public void sendNewMonitorMsg(XmlContentHandler xh) {
-		if(xh.getSmsRes().result.equals("failure")) {
-			run.handler.sendEmptyMessage(
-					Constant.NEW_MONITOR_FAILURE);
-		} 
-		else {
-			int power = xh.getSmsRes().power;
-			String master = xh.getSmsRes().master;
-			
-			Message msg = run.handler.obtainMessage();
-			msg.what = Constant.NEW_MONITOR_SUCCESES;
-			
-			Bundle bl = new Bundle();
-			bl.putInt("power", power);
-			bl.putString("master", master);
-			bl.putString("devicenum", deviceNum);
-			
-			msg.setData(bl);
-			run.handler.sendMessage(msg);
-		}
+	public void updateMyNumber(Context context, String num) {
 		
-		run.handler.removeCallbacks(run);
-		map.remove(deviceNum + Constant.NEW_MONITOR);
-	}
-	
-	public void sendLocationMsg(XmlContentHandler xh) {
+		SharedPreferences sPref = context.getSharedPreferences("mynumber", Activity.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sPref.edit();
+		editor.putString("mynumber", num);
+		editor.commit();
 		
-		int power = xh.getSmsRes().power;
-		String client = xh.getSmsRes().clientid;
-		double longtitude = xh.getSmsRes().longtitude;
-		double latitude = xh.getSmsRes().latitude;
-		String time  = xh.getSmsRes().time;
-		
-		Message msg = run.handler.obtainMessage();
-		msg.what = Constant.LOCATION_MSG;
-		
-		Bundle bl = new Bundle();
-		bl.putInt("power", power);
-		bl.putString("master", client);
-		bl.putDouble("longitude", longtitude);
-		bl.putDouble("laitude", latitude);
-		bl.putString("time", time);
-		bl.putString("devicenum", deviceNum);
-		
-		msg.setData(bl);
-		run.handler.sendMessage(msg);
-		
-		run.handler.removeCallbacks(run);
-		map.remove(deviceNum + Constant.REAL_LOCATION);
-	}
-	
-	public void sendFrequenceMsg(XmlContentHandler xh) {
-		
-		String result = xh.getSmsRes().result;
-		
-		if(result.equals("success")) 
-			run.handler.sendEmptyMessage(
-					Constant.FREQUENCE_SUCCESES_MSG);
-		else
-			run.handler.sendEmptyMessage(
-					Constant.FREQUENCE_FAIL_MSG);
-		
-		run.handler.removeCallbacks(run);
-		map.remove(deviceNum + Constant.FREQUENCY_SET);
-	}
-	
-	public void sendBindMsg(XmlContentHandler xh) {
-		
-		String result = xh.getSmsRes().result;
-		String masterNum = xh.getSmsRes().master;
-		
-		Message msg = run.handler.obtainMessage();
-		if(result.equals("success"))
-			msg.what = Constant.BIND_SUCCESES_MSG;
-		else {
-			msg.what = Constant.BIND_FAIL_MSG;
-			masterNum = "";
-		}
-		
-		Bundle bl = new Bundle();
-		bl.putString("masternum", masterNum);
-		bl.putString("devicenum", deviceNum);
-		
-		msg.setData(bl);
-		run.handler.sendMessage(msg);
-		
-		run.handler.removeCallbacks(run);
-		map.remove(deviceNum + Constant.BIND);
-	}
-	
-	public void sendUnBindMsg(XmlContentHandler xh) {
-		
-		String masterNum = xh.getSmsRes().master;
-		
-		Message msg = run.handler.obtainMessage();
-		msg.what = Constant.REBIND;
-		Bundle bl = new Bundle();
-		
-		bl.putString("masternum", masterNum);
-		
-		msg.setData(bl);
-		run.handler.sendMessage(msg);
-		
-		run.handler.removeCallbacks(run);
-		map.remove(deviceNum);
 	}
 	
 	public void sendRebindMsg(XmlContentHandler xh) {
@@ -321,13 +396,13 @@ public class SmsReceiver extends BroadcastReceiver {
 		
 		if(result.equals("success")) 
 			run.handler.sendEmptyMessage(
-					Constant.START_REAL_LOCATE);
+					Constant.START_REAL_LOCATE_SUCCESS);
 		else
 			run.handler.sendEmptyMessage(
 					Constant.START_REAL_LOCATE_FAIL);
 		
 		run.handler.removeCallbacks(run);
-		map.remove(deviceNum  + Constant.START_REAL_LOCATE);
+		map.remove(deviceNum  + Constant.START_REAL_LOCATE_SUCCESS);
 	}
 	
 	public void sendStopMsg(XmlContentHandler xh) {
@@ -375,8 +450,8 @@ public class SmsReceiver extends BroadcastReceiver {
             .setContentTitle(id)
             .setContentText(mBody)
             .setSmallIcon(R.drawable.ic_launcher)
-            .setContentIntent(createDisplayMessageIntent(context, deviceNum, notificationId))
-            .setTicker(id);
+            .setContentIntent(createDisplayMessageIntent(context, notificationId));
+//            .setTicker(id);
 
         NotificationManager notificationManager =
             (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -386,8 +461,7 @@ public class SmsReceiver extends BroadcastReceiver {
         notificationManager.notify(notificationId, nf);
     }
 
-    private PendingIntent createDisplayMessageIntent(Context context, String fromAddress,
-            int notificationId) {
+    private PendingIntent createDisplayMessageIntent(Context context, int notificationId) {
         // Trigger the main activity to fire up a dialog that shows the received messages
         Intent di = new Intent();
         //di.setClass(context, DialogSmsDisplay.class);
@@ -407,7 +481,8 @@ public class SmsReceiver extends BroadcastReceiver {
         return pendingIntent;
     }
     
-    public void addWarnMessage(Context context, String id, String cmd) {
+    public void addWarnMessage(Context context, String id, int type) {
+    	
     	ContentResolver cr = context.getContentResolver();
 		ContentValues value = new ContentValues();
 		
@@ -417,15 +492,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		String date = sdf.format(new java.util.Date());
 		value.put(DeviceTableData.TIME, date);
 		
-		if(cmd.equals("powerstatus")) {
-			value.put(DeviceTableData.WARNING_TYPE, Constant.LOW_POWER_WARNING);
-		}
-		else if(cmd.equals("emergency")) {
-			value.put(DeviceTableData.WARNING_TYPE, Constant.EMERGENCY);
-		}
-		else if(cmd.equals("unbinded")) {
-			value.put(DeviceTableData.WARNING_TYPE, Constant.UNBINDED);
-		}
+		value.put(DeviceTableData.WARNING_TYPE, type);
 		
 		cr.insert(DeviceTableData.CONTENT_URI_W, value);
 		

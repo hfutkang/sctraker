@@ -33,7 +33,7 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
-    <uses-permission android:name="android.permission.WRITE_SMS" /> 
+    <uses-permission android:name="android.permission.WRITE_SMS" />
     <!-- SDK1.5需要android.permission.GET_TASKS权限判断本程序是否为当前运行的应用? -->
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CAMERA" >
@@ -41,11 +41,11 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" >
     </uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <!-- 来电消音 s4OYTr55hAxDOIarThRfHSGt Dk1PIx2MklZpqGz3PvkUXGXX-->
+    <!-- 来电消音 s4OYTr55hAxDOIarThRfHSGt Dk1PIx2MklZpqGz3PvkUXGXX -->
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" >
     </uses-permission>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -66,10 +66,11 @@
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="Dk1PIx2MklZpqGz3PvkUXGXX" />
+
         <activity
             android:name=".TrackerStartActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -90,8 +91,10 @@
         <receiver android:name=".SmsReceiver" >
             <intent-filter android:priority="2147483647" >
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-               <!--  <action android:name="SMS_SEND_ACTION"/>
-                <action android:name="SMS_DEVLIVERED_ACTION" /> -->
+                <!--
+                <action android:name="SMS_SEND_ACTION"/>
+                <action android:name="SMS_DEVLIVERED_ACTION" />
+                -->
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
@@ -131,9 +134,15 @@
         </activity>
         <activity
             android:name=".DeviceVerifyActivity"
-            android:label="@string/title_activity_device_verify" 
+            android:label="@string/title_activity_device_verify"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".MyPhoneNumberActivity"
+            android:label="@string/title_activity_my_phone_number"
             android:theme="@android:style/Theme.Light.NoTitleBar"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"  >
         </activity>
     </application>
 

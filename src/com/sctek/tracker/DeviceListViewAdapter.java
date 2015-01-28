@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.sctek.tracker.DeviceProvideData.DeviceTableData;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 public class DeviceListViewAdapter extends BaseAdapter{
 	
 	private final String TAG = "DeviceListViewAdapter";
+	private final int BASE_SETREQUEST_CODE = 4;
 	
 	private Context mContext;
 	private ContentResolver contentResolver;
@@ -85,31 +87,6 @@ public class DeviceListViewAdapter extends BaseAdapter{
 			ImageView refresh = (ImageView)convertView.findViewById(R.id.refresh_iv);
 			TextView lposition = (TextView)convertView.findViewById(R.id.position_tv);
 			
-			deviceName.setText(data.name);
-			deviceId.setText(data.deviceId);
-			masterNum.setText(data.masterNum);
-			battery.setImageResource(getPowerResId(data.power));
-			lposition.setText(data.last_position);
-			refresh.setEnabled(true);
-			refresh.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					Intent intent = new Intent(mContext, HttpLocateService.class);
-					intent.putExtra("type", Constant.LAST_POSITION);
-					intent.putExtra("id", data.deviceId);
-					mContext.startService(intent);
-					v.setEnabled(false);
-				}
-			});
-			
-		   if (f.exists()) {
-			   Bitmap bm = BitmapFactory.decodeFile(data.imagePath);
-			   Drawable drawable=new BitmapDrawable(bm);
-			   deviceLable.setImageDrawable(drawable);
-		    }
-			
 			holder.lable = deviceLable;
 			holder.name = deviceName;
 			holder.deviceId = deviceId;
@@ -119,8 +96,6 @@ public class DeviceListViewAdapter extends BaseAdapter{
 			holder.postion = lposition;
 			
 			convertView.setTag(holder);
-			
-			return convertView;
 		}
 		
 		holder = (Holder)convertView.getTag();
@@ -152,6 +127,16 @@ public class DeviceListViewAdapter extends BaseAdapter{
 		}
 		else
 			holder.lable.setImageResource(R.drawable.ic_postition_marker);
+		holder.lable.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(mContext, BaseInformationSettingActivity.class);
+				intent.putExtra("deviceid", data.deviceId);
+				((MainActivity)mContext).startActivityForResult(intent, BASE_SETREQUEST_CODE);
+			}
+		});
 		
 		return convertView;
 	}

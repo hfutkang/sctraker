@@ -50,12 +50,13 @@ public class SmsUtils {
 		}
 	}
 
-	public static void setFrequence(String dNum, int reportFrequence, String pw, PendingIntent spi, PendingIntent dpi) {
+	public static void setFrequence(String dNum, String id , int reportFrequence, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
 		msgBody.append("<cmd>regular</cmd>" + '\n');
+		msgBody.append("<id>" + id + "</id>");
 		msgBody.append("<freq>" + reportFrequence + "</freq>" + '\n');
 		msgBody.append("<pw>" + pw + "</pw>");
 		msgBody.append("</tracer>");
@@ -111,12 +112,13 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void sendRebindMessage(String dNum, String pw, PendingIntent spi, PendingIntent dpi) {
+	public static void sendRebindMessage(String dNum, String id, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
 		msgBody.append("<cmd>rebind</cmd>" + '\n');
+		msgBody.append("<id>" + id + "</id>");
 		msgBody.append("<pw>" + pw + "</pw>");
 		msgBody.append("</tracer>");
 		
@@ -138,12 +140,13 @@ public class SmsUtils {
 		
 	}
 
-	public static void startLocation(String dNum, int fre, String pw, PendingIntent spi, PendingIntent dpi) {
+	public static void startLocation(String dNum, String id, int fre, String pw, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
 		msgBody.append("<cmd>real</cmd>" + '\n');
+		msgBody.append("<id>" + id + "</id>");
 		msgBody.append("<freq>" + (fre == 5?("0" + fre):fre) + "</freq>" + '\n');
 		msgBody.append("<switch>on</switch>");
 		msgBody.append("<pw>" + pw + "</pw>" + '\n');
@@ -160,12 +163,13 @@ public class SmsUtils {
 		}
 	}
 	
-	public static void stopLocation(String dNum, String pw, int fre, PendingIntent spi, PendingIntent dpi) {
+	public static void stopLocation(String dNum, String id, String pw, int fre, PendingIntent spi, PendingIntent dpi) {
 		
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
 		msgBody.append("<cmd>real</cmd>" + '\n');
+		msgBody.append("<id>" + id + "</id>");
 		msgBody.append("<freq>" + (fre == 5?("0" + fre):fre) + "</freq>" + '\n');
 		msgBody.append("<switch>off</switch>");
 		msgBody.append("<pw>" + pw + "</pw>" + '\n');
@@ -182,13 +186,14 @@ public class SmsUtils {
 		}
 	}
 
-	public static void sendModifyPwMessage(String dNum, String newPw,
+	public static void sendModifyPwMessage(String dNum, String id, String newPw,
 			String pw, PendingIntent spi, PendingIntent dpi) {
 
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
 		msgBody.append("<cmd>modifypw</cmd>" + '\n');
+		msgBody.append("<id>" + id + "</id>");
 		msgBody.append("<pw>" + newPw + "</pw>" + '\n');
 		msgBody.append("<old>" + pw + "</old>" + '\n');
 		msgBody.append("</tracer>");

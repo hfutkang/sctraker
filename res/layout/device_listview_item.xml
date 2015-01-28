@@ -9,6 +9,7 @@
 	        android:layout_width="@dimen/d65"
 	        android:layout_height="@dimen/d65"
 	        android:src="@drawable/ic_postition_marker"
+	        android:background="@drawable/image_button_transparent_selector"
 	        app:border_width="1dp"
 	        app:border_color="@color/water"
 	        android:layout_alignParentLeft="true"

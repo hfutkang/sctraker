@@ -26,7 +26,13 @@
     <string name="real_location">实时位置</string>
     <string name="history_trace">查询足迹</string>
     <string name="start_real_location">开启定位</string>
+    <string name="start_real_location_no_bind">设备尚未绑定主控，开启定位失败，请先通过添加设备绑定为主控</string>
+    <string name="start_real_location_pw_error">密码错误，开启实时定位失败</string>
+    <string name="start_real_location_id_error">设备编号不匹配，开启定位失败，请检查设备SIM卡是否插错</string>
     <string name="stop_real_location">关闭定位</string>
+    <string name="stop_real_location_no_bind">设备尚未绑定主控，关闭定位失败，请先通过添加设备绑定为主控</string>
+    <string name="stop_real_location_pw_error">密码错误，关闭实时定位失败</string>
+    <string name="stop_real_location_id_error">设备编号不匹配，关闭定位失败，请检查设备SIM卡是否插错</string>
     <string name="start_real_location_timeout">开启实时定位超时</string>
     <string name="stop_real_location_timeout">关闭实时定位超时</string>
     <string name="start_real_locate_success">实时定位已开启</string>
@@ -54,16 +60,26 @@
     <string name="set_frequence_timeout">频率设置超时</string>
     <string name="set_frequence_fail">频率设置失败</string>
     <string name="set_frequence_ok">频率设置成功</string>
+    <string name="set_frequence_no_bind">设备尚未绑定主控，设置频率失败，请先通过添加设备绑定为主控</string>
+    <string name="set_frequence_pw_error">密码错误，频率设置失败</string>
+    <string name="set_frequence_id_error">设备编号不匹配，设置频率失败，请检查设备SIM卡是否插错</string>
     <string name="bind_timeout">绑定超时</string>
     <string name="unbind_timeout">解绑超时</string>
     <string name="rebind_timeout">重新绑定主控超时</string>
-    <string name="rebind_success">重新绑定主控成功</string>
+    <string name="rebind_success">重绑定为主控成功</string>
+    <string name="rebind_no_bind">重绑定为主控失败，设备尚未绑定任何主控，请通过添加设备绑定为主控</string>
+    <string name="rebind_pw_error">密码错误，重绑定为主控失败</string>
+    <string name="rebind_id_error">设备编号不匹配，重绑定为主控失败，请检查设备SIM卡和输入SIM卡号是否对应</string>
     <string name="rebind_fail">重新绑定主控失败</string>
     <string name="modify_pw_timeout">修改密码超时</string>
     <string name="modify_pw_success">密码修改成功</string>
+    <string name="modify_pw_no_bind">修改密码失败，设备尚未绑定主控，请先通过添加设备绑定为主控</string>
+    <string name="modify_pw_pw_error">旧密码错误，修改密码失败</string>
+    <string name="modify_pw_id_error">设备编号不匹配，修改密码失败，请检查设备SIM卡是否插错</string>
     <string name="modify_pw_fail">密码修改失败</string>
     <string name="device_num_empty">设备号码为空，绑定失败</string>
-    <string name="bind_ok">主控绑定成功</string>
+    <string name="bind_ok">你的手机已成功绑定为主控</string>
+    <string name="already_bind">该设备已绑定主控，绑定为主控失败</string>
     <string name="bind_fail">主控绑定失败</string>
     <string name="unbind_fail">解绑失败</string>
     <string name="unbind_ok">解绑成功</string>
@@ -72,7 +88,8 @@
     <string name="click_to_selete">点击选择头像</string>
     <string name="device_name">设备名字:</string>
     <string name="device_num">设备号码:</string>
-    <string name="self_num">本机号码:</string>
+    <string name="self_num">输入你当前使用的手机号码:</string>
+    <string name="illegal_self_num">请输入你手机号码</string>
     <string name="device_password">设备密码:</string>
     <string name="confirm_password">确认密码:</string>
     <string name="name_hint">为你的设备起一个名字</string>
@@ -132,5 +149,6 @@
     <string name="download_notification_title">追踪器</string>
     <string name="update_fail">新版本下载失败，请重新选择更新</string>
     <string name="title_activity_device_verify">DeviceVerifyActivity</string>
+    <string name="title_activity_my_phone_number">MyPhoneNumberActivity</string>
 
 </resources>

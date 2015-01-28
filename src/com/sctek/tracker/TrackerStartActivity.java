@@ -28,6 +28,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -39,6 +40,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.sax.StartElementListener;
 import android.text.AlteredCharSequence;
 import android.util.Log;
@@ -121,17 +123,6 @@ public class TrackerStartActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		getContentResolver().registerContentObserver(DownloadManagerPro.CONTENT_URI, true, downloadObserver);
-//		new Handler().postDelayed(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//				// TODO Auto-generated method stub
-//				Intent intent = new Intent(
-//						TrackerStartActivity.this, MainActivity.class);
-//				startActivity(intent);
-//				finish();
-//			}
-//		}, 0);
 	}
 	
 	@Override
@@ -227,9 +218,21 @@ public class TrackerStartActivity extends Activity {
 					e.printStackTrace();
 				}
 			}
-			Intent intent = new Intent(
-					TrackerStartActivity.this, MainActivity.class);
-			startActivity(intent);
+			
+			SharedPreferences sPref = PreferenceManager.
+            		getDefaultSharedPreferences(TrackerStartActivity.this);
+            	
+    		if(sPref.contains("mynumber")) {
+            	Intent intent = new Intent(
+						TrackerStartActivity.this, MainActivity.class);
+				startActivity(intent);
+    		}
+    		else {
+    			Intent intent = new Intent(
+    					TrackerStartActivity.this, MyPhoneNumberActivity.class);
+    			startActivity(intent);
+    		}
+    		
 			finish();
 		}
 	};
@@ -266,9 +269,21 @@ public class TrackerStartActivity extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
 				dialog.cancel();
-				Intent intent = new Intent(
-						TrackerStartActivity.this, MainActivity.class);
-				startActivity(intent);
+				
+				SharedPreferences sPref = PreferenceManager.
+                		getDefaultSharedPreferences(TrackerStartActivity.this);
+                	
+        		if(sPref.contains("mynumber")) {
+                	Intent intent = new Intent(
+    						TrackerStartActivity.this, MainActivity.class);
+    				startActivity(intent);
+        		}
+        		else {
+        			Intent intent = new Intent(
+        					TrackerStartActivity.this, MyPhoneNumberActivity.class);
+        			startActivity(intent);
+        		}
+        		
 				finish();
 			}
 		});
@@ -301,9 +316,21 @@ public class TrackerStartActivity extends Activity {
             	  apkFile.delete();
              
               downloadManager.remove(downloadId);
-              Intent intent = new Intent(
-						TrackerStartActivity.this, MainActivity.class);
-				startActivity(intent);
+              
+              SharedPreferences sPref = PreferenceManager.
+              		getDefaultSharedPreferences(TrackerStartActivity.this);
+              	
+          		if(sPref.contains("mynumber")) {
+	                	Intent intent = new Intent(
+	    						TrackerStartActivity.this, MainActivity.class);
+	    				startActivity(intent);
+          		}
+          		else {
+          			Intent intent = new Intent(
+          					TrackerStartActivity.this, MyPhoneNumberActivity.class);
+          			startActivity(intent);
+          		}
+          		
 				finish();
 			}
 		});
@@ -401,9 +428,20 @@ public class TrackerStartActivity extends Activity {
                 		showUpdateDialog();
                 		break;
                 case R.id.install_canceled:
-	                	Intent intent = new Intent(
-	    						TrackerStartActivity.this, MainActivity.class);
-	    				startActivity(intent);
+	                	SharedPreferences sPref = PreferenceManager.
+	                		getDefaultSharedPreferences(TrackerStartActivity.this);
+	                	
+	            		if(sPref.contains("mynumber")) {
+		                	Intent intent = new Intent(
+		    						TrackerStartActivity.this, MainActivity.class);
+		    				startActivity(intent);
+	            		}
+	            		else {
+	            			Intent intent = new Intent(
+	            					TrackerStartActivity.this, MyPhoneNumberActivity.class);
+	            			startActivity(intent);
+	            		}
+	            		
 	    				finish();
 	    				break;
                 default:

@@ -28,6 +28,9 @@ public class ServiceManager {
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
+			Log.e(TAG, "ServiceManager onServiceDisconnected");
+			instance = null;
+			context = null;
 			mService = null;
 		}
 		
@@ -41,6 +44,12 @@ public class ServiceManager {
 	
 	public static ServiceManager getServiceManager() {
 		return instance;
+	}
+	
+	public void release() {
+		instance = null;
+		context = null;
+		mService = null;
 	}
 	
 	void bindLocateService() {

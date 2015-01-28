@@ -213,13 +213,11 @@ public class LocationActivity extends Activity {
 	
 	public void recycleElement() {
 		
-		//bdMap.onDestroy();
 		geoCoder.destroy();
 		positions.clear();
 		
 		mApplication = null;
 		positions = null;
-		//bdMap = null;
 		servicemanager = null;
 		waitingDialog = null;
 		tTask = null;
@@ -504,13 +502,8 @@ public class LocationActivity extends Activity {
 								0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
 						PendingIntent dpi = PendingIntent.getBroadcast(LocationActivity.this, 
 								0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
-						SmsUtils.stopLocation(deviceNum, pw, locateFre, spi, dpi);
-//						SmsTimeRunnable runnable = 
-//								new SmsTimeRunnable(handler, 
-//										deviceNum, Constant.STOP_REAL_LOCATE);
-//						handler.postDelayed(runnable, TIME_OUT_PERIOD);
-//						
-//						mApplication.addRunnble(runnable);
+						SmsUtils.stopLocation(deviceNum, deviceId, pw, locateFre, spi, dpi);
+						
 						SharedPreferences.Editor editor = sPref.edit();
 						editor.putBoolean(deviceId + "locating", false);
 						editor.commit();
@@ -527,7 +520,7 @@ public class LocationActivity extends Activity {
 					Intent intent = new Intent(LocationActivity.this
 							, SettingActivity.class);
 					intent.putExtra("deviceid", deviceId);
-					startActivityForResult(intent, SETTING_REQUEST_CODE);
+					startActivity(intent);
 					break;
 				default:
 					break;
@@ -582,13 +575,7 @@ public class LocationActivity extends Activity {
 						0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
 				PendingIntent dpi = PendingIntent.getBroadcast(LocationActivity.this, 
 						0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
-				SmsUtils.startLocation(dNum, locateFre, pw, spi, dpi);
-//				SmsTimeRunnable runnable = 
-//						new SmsTimeRunnable(handler, 
-//								dNum, Constant.START_REAL_LOCATE);
-//				handler.postDelayed(runnable, TIME_OUT_PERIOD);
-//				
-//				mApplication.addRunnble(runnable);
+				SmsUtils.startLocation(dNum, deviceId, locateFre, pw, spi, dpi);
 				
 				SharedPreferences.Editor editor = sPref.edit();
 				editor.putBoolean(deviceId + "locating", true);
@@ -656,11 +643,11 @@ public class LocationActivity extends Activity {
 				String deviceNum = bundle.getString("num");
 				int command = bundle.getInt("cmd");
 				switch (command) {
-				case Constant.START_REAL_LOCATE:
+				case Constant.START_REAL_LOCATE_SUCCESS:
 					Toast.makeText(LocationActivity.this, 
 							R.string.start_real_location_timeout, Toast.LENGTH_SHORT).show();
 					mApplication.removeRunnable(deviceNum
-							+ Constant.START_REAL_LOCATE);
+							+ Constant.START_REAL_LOCATE_SUCCESS);
 				case Constant.STOP_REAL_LOCATE:
 					Toast.makeText(LocationActivity.this, 
 							R.string.stop_real_location_timeout, Toast.LENGTH_SHORT).show();
@@ -668,7 +655,7 @@ public class LocationActivity extends Activity {
 							+ Constant.STOP_REAL_LOCATE);
 				}
 			}
-			else if(msg.what == Constant.START_REAL_LOCATE) {
+			else if(msg.what == Constant.START_REAL_LOCATE_SUCCESS) {
 				Toast.makeText(LocationActivity.this, 
 						R.string.start_real_locate_success, Toast.LENGTH_SHORT).show();
 				SharedPreferences.Editor editor = sPref.edit();

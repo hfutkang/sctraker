@@ -69,6 +69,65 @@ public class WarningListViewAdapter extends BaseAdapter{
 				break;
 			case Constant.UNBINDED:
 				warn.setText(R.string.master_unbind);
+			case Constant.BIND_SUCCESES_MSG:
+				warn.setText(R.string.bind_ok);
+				break;
+			case Constant.ALREADY_BIND:
+				warn.setText(R.string.already_bind);
+				break;
+			case Constant.REBIND_SUCCESS_MSG:
+				warn.setText(R.string.rebind_success);
+				break;
+			case Constant.REBIND_NO_BIND:
+				warn.setText(R.string.rebind_no_bind);
+				break;
+			case Constant.REBIND_PWD_ERROR:
+				warn.setText(R.string.rebind_pw_error);
+				break;
+			case Constant.REBIND_ID_ERROR:
+				warn.setText(R.string.rebind_id_error);
+				break;
+			case Constant.NEW_PASSWORD_SUCCESS:
+				warn.setText(R.string.modify_pw_success);
+				break;
+			case Constant.NEW_PASSWORD_NO_BIND:
+				warn.setText(R.string.modify_pw_no_bind);
+				break;
+			case Constant.NEW_PASSWORD_PW_ERROR:
+				warn.setText(R.string.modify_pw_pw_error);
+				break;
+			case Constant.NEW_PASSWORD_ID_ERROR:
+				warn.setText(R.string.modify_pw_id_error);
+				break;
+			case Constant.FREQUENCE_SUCCESES_MSG:
+				warn.setText(R.string.set_frequence_ok);
+				break;
+			case Constant.FREQUENCE_NO_BIND:
+				warn.setText(R.string.set_frequence_no_bind);
+				break;
+			case Constant.FREQUENCE_PW_ERROR:
+				warn.setText(R.string.set_frequence_pw_error);
+				break;
+			case Constant.FREQUENCE_ID_ERROR:
+				warn.setText(R.string.set_frequence_id_error);
+				break;
+			case Constant.START_LOCATE_NO_BIND:
+				warn.setText(R.string.start_real_location_no_bind);
+				break;
+			case Constant.START_LOCATE_PW_ERROR:
+				warn.setText(R.string.start_real_location_pw_error);
+				break;
+			case Constant.START_LOCATE_ID_ERROR:
+				warn.setText(R.string.start_real_location_id_error);
+				break;
+			case Constant.STOP_LOCATE_NO_BIND:
+				warn.setText(R.string.stop_real_location_no_bind);
+				break;
+			case Constant.STOP_LOCATE_PW_ERROR:
+				warn.setText(R.string.stop_real_location_pw_error);
+				break;
+			case Constant.STOP_LOCATE_ID_ERROR:
+				warn.setText(R.string.stop_real_location_id_error);
 				break;
 			default:
 				break;
@@ -94,6 +153,66 @@ public class WarningListViewAdapter extends BaseAdapter{
 			break;
 		case Constant.UNBINDED:
 			holder.warning.setText(R.string.master_unbind);
+			break;
+		case Constant.BIND_SUCCESES_MSG:
+			holder.warning.setText(R.string.bind_ok);
+			break;
+		case Constant.ALREADY_BIND:
+			holder.warning.setText(R.string.already_bind);
+			break;
+		case Constant.REBIND_SUCCESS_MSG:
+			holder.warning.setText(R.string.rebind_success);
+			break;
+		case Constant.REBIND_NO_BIND:
+			holder.warning.setText(R.string.rebind_no_bind);
+			break;
+		case Constant.REBIND_PWD_ERROR:
+			holder.warning.setText(R.string.rebind_pw_error);
+			break;
+		case Constant.REBIND_ID_ERROR:
+			holder.warning.setText(R.string.rebind_id_error);
+			break;
+		case Constant.NEW_PASSWORD_SUCCESS:
+			holder.warning.setText(R.string.modify_pw_success);
+			break;
+		case Constant.NEW_PASSWORD_NO_BIND:
+			holder.warning.setText(R.string.modify_pw_no_bind);
+			break;
+		case Constant.NEW_PASSWORD_PW_ERROR:
+			holder.warning.setText(R.string.modify_pw_pw_error);
+			break;
+		case Constant.NEW_PASSWORD_ID_ERROR:
+			holder.warning.setText(R.string.modify_pw_id_error);
+			break;
+		case Constant.FREQUENCE_SUCCESES_MSG:
+			holder.warning.setText(R.string.set_frequence_ok);
+			break;
+		case Constant.FREQUENCE_NO_BIND:
+			holder.warning.setText(R.string.set_frequence_no_bind);
+			break;
+		case Constant.FREQUENCE_PW_ERROR:
+			holder.warning.setText(R.string.set_frequence_pw_error);
+			break;
+		case Constant.FREQUENCE_ID_ERROR:
+			holder.warning.setText(R.string.set_frequence_id_error);
+			break;
+		case Constant.START_LOCATE_NO_BIND:
+			holder.warning.setText(R.string.start_real_location_no_bind);
+			break;
+		case Constant.START_LOCATE_PW_ERROR:
+			holder.warning.setText(R.string.start_real_location_pw_error);
+			break;
+		case Constant.START_LOCATE_ID_ERROR:
+			holder.warning.setText(R.string.start_real_location_id_error);
+			break;
+		case Constant.STOP_LOCATE_NO_BIND:
+			holder.warning.setText(R.string.stop_real_location_no_bind);
+			break;
+		case Constant.STOP_LOCATE_PW_ERROR:
+			holder.warning.setText(R.string.stop_real_location_pw_error);
+			break;
+		case Constant.STOP_LOCATE_ID_ERROR:
+			holder.warning.setText(R.string.stop_real_location_id_error);
 			break;
 		default:
 			break;

@@ -1,6 +1,5 @@
 package com.sctek.tracker;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -16,8 +15,11 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -27,12 +29,14 @@ import android.os.Message;
 import android.provider.Telephony;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -46,7 +50,10 @@ public class MainActivity extends Activity {
 	
 	private final int NEW_DEVICE_REQUEST_CODE = 1;
 	private final int LOCATE_REQUEST_CODE = 2;
+	private final int BASE_SETREQUEST_CODE = 4;
 	private static final int DEVICE_INFORMATION_REQUEST = 3;
+	
+	private String selfNumber;
 	
 	private final static long TIME_OUT_PERIOD = 2*60*1000;
 	
@@ -96,6 +103,10 @@ public class MainActivity extends Activity {
 			}
 		}, 0);
 		//sendStateReqMessage();
+		
+		IntentFilter filter = new IntentFilter(Constant.BIND_SUCCESS_ACTION);
+		filter.addAction(Constant.BIND_FAIL_ACTION);
+		registerReceiver(bindBroadcastReceiver, filter);
 
 	}
 	
@@ -117,7 +128,18 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
+		
+		Intent intent = new Intent(this, HttpLocateService.class);
+		stopService(intent);
+		
 		servicemanager.unBindLocateService();
+		
+		servicemanager.release();
+		
+		mApplication.getHandler().removeCallbacksAndMessages(null);
+		
+		mApplication.cleanBindWaitDevices();
+		
 		super.onDestroy();
 	}
 	
@@ -155,56 +177,75 @@ public class MainActivity extends Activity {
 			String pw = bundle.getString("pw");
 			
 			if(newDevice.isMaster.equals("true")) {
+				
 				PendingIntent spi = PendingIntent.getBroadcast(MainActivity.this, 
 						0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
 				PendingIntent dpi = PendingIntent.getBroadcast(MainActivity.this, 
 						0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
 				SmsUtils.sendBindMessage(newDevice.deviceNum, 
 						newDevice.deviceId, pw, spi, dpi);
+				
 				SmsTimeRunnable runnable = 
 						new SmsTimeRunnable(getApplicationContext()
 								, newDevice.deviceNum, Constant.BIND);
-				handler.postDelayed(runnable, TIME_OUT_PERIOD);
+				mApplication.getHandler().postDelayed(runnable, TIME_OUT_PERIOD);
 				
-//				mApplication.addRunnble(runnable);
-				SharedPreferences.Editor editor = hasNumberPref.edit();
+				newDevice.pw = pw;
+				mApplication.addNewWaitDevice(newDevice);
+				
+				SharedPreferences sPref = getSharedPreferences("hasnumber", 
+						Activity.MODE_PRIVATE);
+				SharedPreferences.Editor editor = sPref.edit();
 				editor.putBoolean(newDevice.deviceNum, true);
 				editor.commit();
 				
-				newDevice.pw = pw; 
-				
 				waitView.setVisibility(View.VISIBLE);
 				newDeviceBt.setEnabled(false);
-//				mApplication.addNewDevice(newDevice);
-//				lvAdapter.notifyDataSetChanged();
+				
+				mApplication.getHandler().postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						waitView.setVisibility(View.GONE);
+						newDeviceBt.setEnabled(true);
+					}
+				}, TIME_OUT_PERIOD);
 				
 			}
 			else {
-//				Intent intent = new Intent(this, HttpLocateService.class);
-//				intent.putExtra("type", Constant.VERIFY_REQ);
-//				intent.putExtra("id", newDevice.deviceId);
-//				startService(intent);
 				mApplication.addNewDevice(newDevice);
 				lvAdapter.notifyDataSetChanged();
 			}
 			
 		}
-		else if(requestCode == LOCATE_REQUEST_CODE
+		else if(requestCode == BASE_SETREQUEST_CODE
 				&&resultCode == RESULT_OK)
 			lvAdapter.notifyDataSetChanged();
 		else if(requestCode == NEW_DEVICE_REQUEST_CODE
 				&&resultCode == RESULT_OK) {
+			
 			newDevice.clean();
 			newDevice.deviceId = bundle.getString("id");
 			newDevice.masterNum = bundle.getString("master");
-			newDevice.isMaster = bundle.getString("initialized").
-					equals("1")?"false":"true";
 			newDevice.pw = bundle.getString("pw");
+			
 			Intent intent = new Intent(MainActivity.this, NewDeviceActivity.class);
 			intent.putExtra("initialized", bundle.getString("initialized"));
 			intent.putExtra("count", lvAdapter.getCount());
 			intent.putExtra("pw", newDevice.pw);
-			startActivityForResult(intent, DEVICE_INFORMATION_REQUEST);
+			
+			if(selfNumber.equals(newDevice.masterNum)) {
+				
+				newDevice.isMaster = "true";
+				showDeviceNumDialog();
+				
+			} else {
+				
+				newDevice.isMaster = bundle.getString("initialized")
+					.equals("1")?"false":"true";
+				startActivityForResult(intent, DEVICE_INFORMATION_REQUEST);
+			}
 		}
 		
 		super.onActivityResult(requestCode, resultCode, data);
@@ -248,6 +289,10 @@ public class MainActivity extends Activity {
 		hasNumberPref = getSharedPreferences("hasnumber", 
 				Activity.MODE_PRIVATE);
 		
+		selfNumber = getSharedPreferences("mynumber", Activity.MODE_PRIVATE)
+				.getString("mynumber", "");
+		
+		
 		servicemanager = new ServiceManager(this);
 		newDevice = new DeviceListViewData();
 		
@@ -266,7 +311,7 @@ public class MainActivity extends Activity {
 				String deviceId = lvD.get(position).deviceId;
 				intent.putExtra("deviceid", deviceId);
 				
-				startActivityForResult(intent, LOCATE_REQUEST_CODE);
+				startActivity(intent);
 			}
 		});
 		
@@ -329,27 +374,52 @@ public class MainActivity extends Activity {
 		deleteDilDialog.show();
 	}
 	
-	private void sendStateReqMessage() {
+@SuppressLint("NewApi")
+public void showDeviceNumDialog() {
 		
-		ArrayList<DeviceListViewData> lvData = mApplication.getDeviceList();
-		Iterator<DeviceListViewData> it = lvData.iterator();
+		LayoutInflater layoutInflater = LayoutInflater.from(this);
+		View dialogView = layoutInflater.inflate(R.layout.devicenum_dialog, null);
+		final EditText dNumEt = (EditText)dialogView.findViewById(R.id.device_num_et);
 		
-		while(it.hasNext()) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 			
-			DeviceListViewData dd = it.next();
-			PendingIntent spi = PendingIntent.getBroadcast(MainActivity.this, 
-					0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
-			PendingIntent dpi = PendingIntent.getBroadcast(MainActivity.this, 
-					0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
-			SmsUtils.stateRequest(dd.deviceNum, spi, dpi);
-			
-			SmsTimeRunnable runnable = 
-					new SmsTimeRunnable(getApplicationContext(), dd.deviceNum, Constant.STATE_REQUEST);
-			handler.postDelayed(runnable, 1000);
-			
-//			mApplication.addRunnble(runnable);
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				String dNum = dNumEt.getText().toString();
+				if(dNum.isEmpty()){
+					Toast.makeText(MainActivity.this, 
+							R.string.device_num_empty, Toast.LENGTH_SHORT).show();
+					return;
+				}
+				
+				newDevice.deviceNum = dNum;
+				
+				SharedPreferences sPref = getSharedPreferences("hasnumber", 
+						Activity.MODE_PRIVATE);
+				SharedPreferences.Editor editor = sPref.edit();
+				editor.putBoolean(dNum, true);
+				editor.commit();
+				
+				mApplication.addNewDevice(newDevice);
+				lvAdapter.notifyDataSetChanged();
+				
+				dialog.dismiss();
+			}
+		});
 		
-		}
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				dialog.dismiss();
+			}
+		});
+		
+		builder.setView(dialogView);
+		builder.create().show();
 	}
 	
 	private void getLastPosition() {
@@ -489,6 +559,23 @@ public class MainActivity extends Activity {
 			}
 			else if(msg.what == Constant.LAST_POSITION_FAIL
 					||msg.what == Constant.EMPTY_DATA) {
+				lvAdapter.notifyDataSetChanged();
+			}
+		}
+	};
+	
+	private BroadcastReceiver bindBroadcastReceiver = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+			Log.e(TAG, "onReceive");
+			mApplication.getHandler().removeCallbacksAndMessages(null);
+			
+			waitView.setVisibility(View.GONE);
+			newDeviceBt.setEnabled(true);
+			
+			if(Constant.BIND_SUCCESS_ACTION.equals(intent.getAction())) {
 				lvAdapter.notifyDataSetChanged();
 			}
 		}

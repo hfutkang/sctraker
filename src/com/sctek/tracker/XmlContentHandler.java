@@ -114,7 +114,7 @@ public class XmlContentHandler extends DefaultHandler {
 				smsRes.initialized = new String(ch, start, length);
 				nodeName = "";
 			}
-			else if(nodeName.equals("password")) {
+			else if(nodeName.equals("pw")) {
 				smsRes.pw = new String(ch, start, length);
 				nodeName = "";
 			}

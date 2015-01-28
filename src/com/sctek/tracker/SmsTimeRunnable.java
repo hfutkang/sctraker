@@ -38,21 +38,8 @@ public class SmsTimeRunnable implements Runnable {
 	public void run() {
 		// TODO Auto-generated method stub
 		Log.e(TAG, "run");
-		SharedPreferences sPref = 
-				mContext.getSharedPreferences("hasnumber", Activity.MODE_PRIVATE);
-		SharedPreferences.Editor edit = sPref.edit();
-		edit.remove(number);
-		edit.commit();
+		
 		addNotification(mContext, "追踪器", command);
-//		Message msg = handler.obtainMessage();
-//		msg.what = Constant.TIMEOUT_MSG;
-//		
-//		Bundle bundle = new Bundle();
-//		bundle.putString("num", number);
-//		bundle.putInt("cmd", command);
-//		
-//		msg.setData(bundle);
-//		handler.sendMessage(msg);
 		
 	}
 	
@@ -65,10 +52,13 @@ public class SmsTimeRunnable implements Runnable {
         String mBody = null;
         switch (cmd) {
         case Constant.BIND:
-        	mBody = "添加设备超时，请检查设备是否开启";
+        	mBody = "添加设备操作长时间没有收到回应，\n请检查设备是否开启，SIM卡号是否输入正确";
         	break;
         case Constant.REBIND:
-        	mBody = "重绑定超时";
+        	mBody = "重绑定操作长时间没有收到回应，\n请检查设备是否开启，SIM卡号是否输入正确";
+        	break;
+        case Constant.NEW_PASSWORD:
+        	mBody = "修改密码操作长时间没有收到回应，\n请检查设备是否开启";
         	break;
     	default:
     		mBody = "";
@@ -79,7 +69,7 @@ public class SmsTimeRunnable implements Runnable {
             .setWhen(System.currentTimeMillis())
             .setContentTitle(title)
             .setContentText(mBody)
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_postition_marker)
             .setContentIntent(createDisplayMessageIntent(context, notificationId))
             .setTicker(title);
 

@@ -40,7 +40,7 @@ import android.widget.Toast;
 public class SettingActivity extends Activity {
 	
 	private final String TAG = "SettingActivity";
-	private final String[] items = {"基本信息", "主控绑定", "频率设置","密码设置"};
+	private final String[] items = {"主控绑定", "频率设置","密码设置"};
 	private final int[] reportFrequences = {15, 30, 60};
 	private final int BASE_SETREQUEST_CODE = 2;
 	
@@ -90,10 +90,6 @@ public class SettingActivity extends Activity {
 		}
 		
 		init();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(SMS_DELIVERED_ACTION);
-		filter.addAction(SMS_SEND_ACTION);
-		registerReceiver(mBroadcastReceiver, filter);
 	}
 	
 	@Override
@@ -107,20 +103,8 @@ public class SettingActivity extends Activity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		bindDialog = null;
-		unregisterReceiver(mBroadcastReceiver);
 		super.onDestroy();
 		Log.e(TAG, "onDestory");
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		if(requestCode != BASE_SETREQUEST_CODE
-				||resultCode != RESULT_OK)
-			return;
-		
-		setResult(RESULT_OK);
-		super.onActivityResult(requestCode, resultCode, data);
 	}
 	
 	public void init() {
@@ -150,18 +134,12 @@ public class SettingActivity extends Activity {
 				switch (position) {
 				
 					case 0:
-						Intent intent = new Intent(SettingActivity.this
-								, BaseInformationSettingActivity.class);
-						intent.putExtra("deviceid", deviceId);
-						startActivityForResult(intent, BASE_SETREQUEST_CODE);
-						break;
-					case 1:
 						showBindDialog();
 						break;
-					case 2:
+					case 1:
 						showFrequenceDialog();
 						break;
-					case 3:
+					case 2:
 						showPasswordDialog();
 						break;
 					default:
@@ -185,17 +163,12 @@ public class SettingActivity extends Activity {
 			return;
 		}
 		
-//		if(sharepreferences.getBoolean(deviceId + "freqwaiting", false)) {
-//			Toast.makeText(this
-//					, R.string.waiting, Toast.LENGTH_SHORT).show();
-//			return;
-//		}
 		View view = getLayoutInflater()
 				.inflate(R.layout.frequence_dialog, null);
 		
 		Spinner rsp = (Spinner)view.findViewById(R.id.report_frequence_sp);
 		
-		int rf = sharepreferences.getInt(deviceId + "rfrequence", 30);
+		final int rf = sharepreferences.getInt(deviceId + "rfrequence", 30);
 		
 		int rIndex = getItemIndexR(rf);
 		
@@ -224,9 +197,14 @@ public class SettingActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				// TODO Auto-generated method stub
-				if(isFrequenceChanged()&&isSimAvailable()) {
-					SmsUtils.setFrequence(dNum, reportFrequence, 
+				if(isSimAvailable()) {
+					
+					SmsUtils.setFrequence(dNum, deviceId, reportFrequence,
 							mApplication.getPassword(deviceId), spi,dpi);
+					
+					SharedPreferences.Editor editor = sharepreferences.edit();
+					editor.putInt(deviceId + "rfrequence", reportFrequence);
+					editor.commit();
 				}
 			}
 		});
@@ -245,12 +223,7 @@ public class SettingActivity extends Activity {
 	
 	private void showBindDialog(){
 		
-//		String rebinding = sharepreferences.getString(deviceId + "rebinding", "false");
-//		if(!rebinding.equals("false")) {
-//			Toast.makeText(this, R.string.waiting, Toast.LENGTH_SHORT).show();
-//			return;
-//		}
-		masterNum = getMasterNumber(deviceId);
+		masterNum = mApplication.getMaster(deviceId);
 		isBindDialogshow = true;
 		LayoutInflater layoutInflater = LayoutInflater.from(this);
 		View bindDialogView = layoutInflater.inflate(R.layout.bind_dialog, null);
@@ -282,12 +255,9 @@ public class SettingActivity extends Activity {
 					showDeviceNumDialog();
 				}
 				else if(isSimAvailable()){
-					SmsUtils.sendRebindMessage(dNum, 
+					SmsUtils.sendRebindMessage(dNum, deviceId,
 							mApplication.getPassword(deviceId), spi, dpi);
-//					SharedPreferences.Editor editor = sharepreferences.edit();
-//					editor.putString(deviceId + "rebinding", dNum);
-//					editor.commit();
-//					addRunnable(Constant.REBIND, dNum, 20000);
+					addRunnable(Constant.REBIND, dNum, TIME_OUT_PERIOD);
 				} 
 				bindDialog.cancel();
 			}
@@ -313,19 +283,20 @@ public class SettingActivity extends Activity {
 							R.string.device_num_empty, Toast.LENGTH_SHORT).show();
 					return;
 				}
+				
 				if(!isSimAvailable())
 					return;
-				SmsUtils.sendRebindMessage(dNum, 
+				
+				SmsUtils.sendRebindMessage(dNum, deviceId,
 						mApplication.getPassword(deviceId), spi, dpi);
+				addRunnable(Constant.REBIND, dNum, TIME_OUT_PERIOD);
+				
 				SharedPreferences sPref = getSharedPreferences("hasnumber", 
 						Activity.MODE_PRIVATE);
 				SharedPreferences.Editor editor = sPref.edit();
 				editor.putBoolean(dNum, true);
 				editor.commit();
-//				editor = sharepreferences.edit();
-//				editor.putString(deviceId + "rebinding", dNum);
-//				editor.commit();
-				addRunnable(Constant.REBIND, dNum, TIME_OUT_PERIOD);
+				
 				dialog.dismiss();
 			}
 		});
@@ -344,12 +315,6 @@ public class SettingActivity extends Activity {
 	}
 	
 	public void showPasswordDialog() {
-		
-//		if(!sharepreferences.getString(deviceId + 
-//				"pwwaiting", "false").equals("false")) {
-//			Toast.makeText(this, R.string.waiting, Toast.LENGTH_SHORT).show();
-//			return;
-//		}
 		
 		LayoutInflater layoutInflater = LayoutInflater.from(this);
 		View dialogView = layoutInflater.inflate(R.layout.password_dialog, null);
@@ -395,15 +360,13 @@ public class SettingActivity extends Activity {
 				String newPw = newPwEt.getText().toString();
 				String confirmPw = confirmPwEt.getText().toString();
 				if(isMaster) {
+					
 					if(!isLegal(newPw, confirmPw))
 						return;
-					SmsUtils.sendModifyPwMessage(deviceNum, 
-							newPw, mApplication.getPassword(deviceId), spi, dpi);
-//					addRunnable(Constant.NEW_PASSWORD, deviceNum, TIME_OUT_PERIOD);
 					
-//					SharedPreferences.Editor editor = sharepreferences.edit();
-//					editor.putString(deviceId + "pwwaiting", newPw);
-//					editor.commit();
+					SmsUtils.sendModifyPwMessage(deviceNum, deviceId,
+							newPw, mApplication.getPassword(deviceId), spi, dpi);		
+					addRunnable(Constant.NEW_PASSWORD, deviceNum, TIME_OUT_PERIOD);
 					
 					passwordDialog.dismiss();
 				}
@@ -489,9 +452,8 @@ public class SettingActivity extends Activity {
 		
 		SmsTimeRunnable runnable = 
 				new SmsTimeRunnable(getApplicationContext(), dNum, cmd);
-		handler.postDelayed(runnable, delay);
+		mApplication.getHandler().postDelayed(runnable, delay);
 		
-//		mApplication.addRunnble(runnable);
 	}
 	
 	Handler handler = new Handler() {
@@ -536,7 +498,7 @@ public class SettingActivity extends Activity {
 					mApplication.removeRunnable(deviceNum);
 				}
 			}
-			else if(msg.what == Constant.FREQUENCE_FAIL_MSG) {
+			else if(msg.what == Constant.FREQUENCE_NO_BIND) {
 				Toast.makeText(SettingActivity.this
 						, R.string.set_frequence_fail, Toast.LENGTH_SHORT).show();
 				
@@ -627,6 +589,7 @@ public class SettingActivity extends Activity {
 					editor = sPref.edit();
 					editor.remove(dNum);
 					editor.commit();
+					
 					Toast.makeText(SettingActivity.this
 						, R.string.rebind_fail, Toast.LENGTH_SHORT).show();
 				}
@@ -653,37 +616,4 @@ public class SettingActivity extends Activity {
 		}
 	};
 	
-	private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			// TODO Auto-generated method stub
-			if(SMS_SEND_ACTION.equals(intent.getAction())) {
-				switch(getResultCode()) {
-				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Log.e(TAG, "SEND:" + "RESULT_ERROR_GENERIC_FAILURE");
-					break;
-				case Activity.RESULT_OK:
-					Log.e(TAG, "SEND:" + "RESULT_OK");
-					break;
-				default:
-					Log.e(TAG, "SEND:" + "fail");
-					break;
-				}
-			}
-			if(SMS_DELIVERED_ACTION.equals(intent.getAction())) {
-				switch(getResultCode()) {
-				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-					Log.e(TAG, "DELIVERE:" + "RESULT_ERROR_GENERIC_FAILURE");
-					break;
-				case Activity.RESULT_OK:
-					Log.e(TAG, "DELIVERE:" + "RESULT_OK");
-					break;
-				default:
-					Log.e(TAG, "DELIVERE:" + "fail");
-					break;
-				}
-			}
-		}
-	};
 }

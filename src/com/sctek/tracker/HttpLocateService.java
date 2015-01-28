@@ -141,6 +141,7 @@ public class HttpLocateService extends Service{
 		Log.e(TAG, "onDestroy");
 		if(timer != null)
 			timer.cancel();
+		timer = null;
 		
 		super.onDestroy();
 	}

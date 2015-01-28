@@ -3,6 +3,8 @@ package com.sctek.tracker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.sctek.tracker.DeviceProvideData.DeviceTableData;
@@ -16,6 +18,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 public class TrackerApplication extends Application {
@@ -23,8 +26,10 @@ public class TrackerApplication extends Application {
 	private final String TAG = "TrackerApplication";
 	
 	private ArrayList<DeviceListViewData> deviceList;
+	private ArrayList<bwDevice> bindWaitDevices;
 	private HashMap<String, SmsTimeRunnable> runnableMap;
 	private ContentResolver contentResolver;
+	private Handler handler;
 	
 	private int notificationId;
 	@Override
@@ -34,11 +39,14 @@ public class TrackerApplication extends Application {
 		super.onCreate();
 		SDKInitializer.initialize(this);
 		deviceList = new ArrayList<DeviceListViewData>();
+		bindWaitDevices = new ArrayList<bwDevice>();
 		runnableMap = new HashMap<String, SmsTimeRunnable>();
 		contentResolver = getContentResolver();
+		handler = new Handler();
 		
 		loadDeviceList();
 		notificationId = 0;
+		
 	}
 	
 	public void loadDeviceList() {
@@ -120,6 +128,47 @@ public class TrackerApplication extends Application {
 		return deviceList;
 	}
 	
+	public ArrayList<bwDevice> getWaitDevices() {
+		return bindWaitDevices;
+	}
+	
+	public void addNewWaitDevice(DeviceListViewData newD) {
+		
+		bwDevice bd = new bwDevice();
+		bd.wDevice = newD;
+		bd.addTime = System.currentTimeMillis();
+		bindWaitDevices.add(bd);
+		
+	}
+	
+	public DeviceListViewData getWaitDevice(String id, String num) {
+		for(bwDevice d : bindWaitDevices) {
+			if(id.equals(d.wDevice.deviceId)&&
+					num.equals(d.wDevice.deviceNum))
+				return d.wDevice;
+		}
+		return null;
+	}
+	
+	public Handler getHandler() {
+		return handler;
+	}
+	
+	public void removeWaitDevice(String id) {
+		
+		for(int i = 0; i< bindWaitDevices.size(); i++) {
+			bwDevice d = bindWaitDevices.get(i);
+			if(d.wDevice.deviceId.equals(id)) {
+				bindWaitDevices.remove(i);
+				return;
+			}
+		}
+	}
+	
+	public void cleanBindWaitDevices() {
+		bindWaitDevices.clear();
+	}
+	
 	public void addRunnble(SmsTimeRunnable r) {
 		runnableMap.put(r.number + r.command, r);
 	}
@@ -174,6 +223,12 @@ public class TrackerApplication extends Application {
 			String rowId = uri.getPathSegments().get(1);
 			dd.id = Integer.valueOf(rowId);
 			deviceList.add(dd);
+			
+			SharedPreferences sPref = getSharedPreferences("hasnumber",
+					Activity.MODE_PRIVATE);
+			SharedPreferences.Editor editor = sPref.edit();
+			editor.putBoolean(dd.deviceNum, true);
+			editor.commit();
 			
 			return true;
 		} 
@@ -259,7 +314,7 @@ public class TrackerApplication extends Application {
 		return ++notificationId;
 	}
 	
-	public boolean hasDevice(String num) {
+	public boolean hasNumber(String num) {
 		
 		SharedPreferences sPref = getSharedPreferences("hasnumber",
 				Activity.MODE_PRIVATE);
@@ -272,10 +327,21 @@ public class TrackerApplication extends Application {
 		for(int i = 0; i < deviceList.size(); i++) {
 			 dd= deviceList.get(i);
 			if(dd.deviceId.equals(id)) 
-				break;
+				return dd.pw;
 			
 		}
-		return dd.pw;
+		return "";
+	}
+	
+	public String getMaster(String id) {
+		DeviceListViewData dd = null;
+		for(int i = 0; i < deviceList.size(); i++) {
+			 dd= deviceList.get(i);
+			if(dd.deviceId.equals(id)) 
+				return dd.masterNum;
+			
+		}
+		return "";
 	}
 	
 	public void updatePassword(String id, String newPw) {
@@ -305,6 +371,15 @@ public class TrackerApplication extends Application {
 		return "";
 	}
 	
+	public boolean isThisNumberMaster(String num) {
+		for(DeviceListViewData dd : deviceList) {
+			if(num.equals(dd.deviceNum)
+					&&"true".equals(dd.isMaster))
+				return true;
+		}
+		return false;
+	}
+	
 	public String isMaster(String id) {
 		DeviceListViewData dd = null;
 		for(int i = 0; i < deviceList.size(); i++) {
@@ -315,6 +390,11 @@ public class TrackerApplication extends Application {
 		}
 		Log.e(TAG, dd.isMaster + " " + dd.deviceId + " " + dd.deviceNum);
 		return dd.isMaster.equals("true")?dd.deviceNum:"false";
+	}
+	
+	public class bwDevice {
+		public DeviceListViewData wDevice;
+		public long addTime;
 	}
 
 }
