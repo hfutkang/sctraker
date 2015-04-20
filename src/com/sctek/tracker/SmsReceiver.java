@@ -30,6 +30,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.Telephony.Sms;
 import android.telephony.SmsMessage;
 import android.util.Log;
@@ -94,6 +95,7 @@ public class SmsReceiver extends BroadcastReceiver {
 				try{
 					
 					String msgBody = smsMessages[n].getMessageBody();
+					Log.e(TAG, msgBody);
 					StringReader stringReader = new StringReader(msgBody);
 					
 					SAXParserFactory factory = SAXParserFactory.newInstance();    
@@ -103,12 +105,11 @@ public class SmsReceiver extends BroadcastReceiver {
 					xmlReader.setContentHandler(xmlHandler);
 					xmlReader.parse(new InputSource(stringReader));
 					
-					if(msgBody.contains("bindres")) {
-						addBindresNotification(xmlHandler, context);
-						
-					} 
-					else if(msgBody.contains("rebindres"))
+					if(msgBody.contains("rebindres")) {
 						addRebindNotification(xmlHandler, context);
+					} 
+					else if(msgBody.contains("bindres"))
+						addBindresNotification(xmlHandler, context);
 					
 					else if(msgBody.contains("powerstatus")) {	
 						SmsResData d = xmlHandler.getSmsRes();
@@ -136,7 +137,7 @@ public class SmsReceiver extends BroadcastReceiver {
 						}
 					}
 					xmlHandler = null;
-					this.abortBroadcast();
+//					this.abortBroadcast();
 				
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -199,7 +200,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	}
 	
 	public void addRebindNotification(XmlContentHandler xh, Context context) {
-		
+		Log.e(TAG, "addRebindNotification");
 		SmsResData data = xh.getSmsRes();
 		
 		String result = data.result;
@@ -211,7 +212,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		String mBody = "";
 		
 		if("success".equals(result)) {
-			
+			Log.e(TAG, "rebind success");
 			mApplication.resetMaster(id, masterNum, "true");
 			mApplication.updateDeviceNum(id, deviceNum);
 			
@@ -234,8 +235,12 @@ public class SmsReceiver extends BroadcastReceiver {
 			
 			mBody = new String(REBIND_FAIL);
 			
+			if("you_are_the_Master!".equals(result)) {
+				wType = Constant.REBIND_ALREADY_IS_MASTER;
+				mBody = new String(REBIND_SUCCESS);
+			}
+			
 		}
-		
 		notify(context, mBody, id, wType);
 		
 	}
@@ -252,6 +257,7 @@ public class SmsReceiver extends BroadcastReceiver {
 		String mBody = "";
 		
 		if("success".equals(result)) {
+			Log.e(TAG, "modify pw suucess");
 			wType = Constant.NEW_PASSWORD_SUCCESS;
 			mBody = new String(NEW_PW_SUCCESS);
 			mApplication.updatePassword(id, pw);
@@ -348,7 +354,7 @@ public class SmsReceiver extends BroadcastReceiver {
         .setWhen(System.currentTimeMillis())
         .setContentTitle(NOTIFICATION_TITLE)
         .setContentText(mBody)
-        .setSmallIcon(R.drawable.ic_postition_marker)
+        .setSmallIcon(R.drawable.postition_marker_gps)
         .setContentIntent(createDisplayMessageIntent(context, notificationId));
 //        .setTicker(id);
 
@@ -365,7 +371,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	
 	public void updateMyNumber(Context context, String num) {
 		
-		SharedPreferences sPref = context.getSharedPreferences("mynumber", Activity.MODE_PRIVATE);
+		SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(context);
 		SharedPreferences.Editor editor = sPref.edit();
 		editor.putString("mynumber", num);
 		editor.commit();
@@ -451,7 +457,7 @@ public class SmsReceiver extends BroadcastReceiver {
             .setContentText(mBody)
             .setSmallIcon(R.drawable.ic_launcher)
             .setContentIntent(createDisplayMessageIntent(context, notificationId));
-//            .setTicker(id);
+//          .setTicker(id);
 
         NotificationManager notificationManager =
             (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);

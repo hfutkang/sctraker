@@ -126,7 +126,7 @@ public class DeviceListViewAdapter extends BaseAdapter{
 			holder.lable.setImageDrawable(drawable);
 		}
 		else
-			holder.lable.setImageResource(R.drawable.ic_postition_marker);
+			holder.lable.setImageResource(R.drawable.postition_marker_gps);
 		holder.lable.setOnClickListener(new OnClickListener() {
 			
 			@Override

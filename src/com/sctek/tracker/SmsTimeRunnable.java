@@ -69,7 +69,7 @@ public class SmsTimeRunnable implements Runnable {
             .setWhen(System.currentTimeMillis())
             .setContentTitle(title)
             .setContentText(mBody)
-            .setSmallIcon(R.drawable.ic_postition_marker)
+            .setSmallIcon(R.drawable.postition_marker_gps)
             .setContentIntent(createDisplayMessageIntent(context, notificationId))
             .setTicker(title);
 

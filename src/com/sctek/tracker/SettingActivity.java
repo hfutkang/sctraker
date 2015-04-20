@@ -1,5 +1,6 @@
 package com.sctek.tracker;
 
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 
 import android.annotation.SuppressLint;
@@ -19,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -40,7 +42,7 @@ import android.widget.Toast;
 public class SettingActivity extends Activity {
 	
 	private final String TAG = "SettingActivity";
-	private final String[] items = {"主控绑定", "频率设置","密码设置"};
+	private final String[] items = {"主控绑定", "密码设置"};
 	private final int[] reportFrequences = {15, 30, 60};
 	private final int BASE_SETREQUEST_CODE = 2;
 	
@@ -136,10 +138,10 @@ public class SettingActivity extends Activity {
 					case 0:
 						showBindDialog();
 						break;
+//					case 1:
+//						showFrequenceDialog();
+//						break;
 					case 1:
-						showFrequenceDialog();
-						break;
-					case 2:
 						showPasswordDialog();
 						break;
 					default:
@@ -150,6 +152,7 @@ public class SettingActivity extends Activity {
 		
 		spi = PendingIntent.getBroadcast(SettingActivity.this, 
 				0, new Intent(SMS_SEND_ACTION), PendingIntent.FLAG_ONE_SHOT);
+		
 		dpi = PendingIntent.getBroadcast(SettingActivity.this, 
 				0, new Intent(SMS_DELIVERED_ACTION), PendingIntent.FLAG_ONE_SHOT);
 	}
@@ -339,6 +342,7 @@ public class SettingActivity extends Activity {
 		final AlertDialog passwordDialog = builder.create();
 		
 		if(!isMaster) {
+			newPwEt.setHint(R.string.vice_password_hint);
 			confirmPwEt.setVisibility(View.GONE);
 			confirmPwTv.setVisibility(View.GONE);
 		}
@@ -371,6 +375,7 @@ public class SettingActivity extends Activity {
 					passwordDialog.dismiss();
 				}
 				else {
+					
 					if(newPw.length() != 6) {
 						Toast.makeText(SettingActivity.this, 
 								R.string.input_six_password, Toast.LENGTH_SHORT).show();
@@ -450,9 +455,9 @@ public class SettingActivity extends Activity {
 	
 	public void addRunnable(int cmd, String dNum, long delay) {
 		
-		SmsTimeRunnable runnable = 
-				new SmsTimeRunnable(getApplicationContext(), dNum, cmd);
-		mApplication.getHandler().postDelayed(runnable, delay);
+//		SmsTimeRunnable runnable = 
+//				new SmsTimeRunnable(getApplicationContext(), dNum, cmd);
+//		mApplication.getHandler().postDelayed(runnable, delay);
 		
 	}
 	

@@ -113,7 +113,7 @@ public class SmsUtils {
 	}
 	
 	public static void sendRebindMessage(String dNum, String id, String pw, PendingIntent spi, PendingIntent dpi) {
-		
+		Log.e(TAG, "sendRebindMessage");
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');
@@ -189,6 +189,7 @@ public class SmsUtils {
 	public static void sendModifyPwMessage(String dNum, String id, String newPw,
 			String pw, PendingIntent spi, PendingIntent dpi) {
 
+		Log.e(TAG, "sendRebindMessage");
 		StringBuffer msgBody = new StringBuffer();
 		
 		msgBody.append("<tracer>" + '\n');

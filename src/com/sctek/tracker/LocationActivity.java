@@ -696,6 +696,7 @@ public class LocationActivity extends Activity {
 				point.time = bundle.getString("time");
 				point.longitude = bundle.getDouble("longitude");
 				point.laitude = bundle.getDouble("laitude");
+				point.type = bundle.getInt("type");
 				
 				positions.add(point);
 			}
@@ -707,6 +708,8 @@ public class LocationActivity extends Activity {
 				point.time = bundle.getString("time");
 				point.longitude = bundle.getDouble("longitude");
 				point.laitude = bundle.getDouble("laitude");
+				point.type = bundle.getInt("type");
+				
 				if(point.time == null)
 					Toast.makeText(LocationActivity.this, 
 							R.string.no_new_position, Toast.LENGTH_SHORT).show();
@@ -810,12 +813,28 @@ public class LocationActivity extends Activity {
 //		b = b + 0.0001;
 		
 		LatLng ll = new LatLng(ld.laitude, ld.longitude);
+//		LatLng ll = new LatLng(22.56350891, 113.93296442);
 		CoordinateConverter cc = new CoordinateConverter();
 		cc.from(CoordType.GPS);
 		cc.coord(ll);
 		LatLng lll = cc.convert();
-		OverlayOptions oo = new MarkerOptions().position(lll)
-				.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_postition_marker));
+		OverlayOptions oo = new MarkerOptions().position(lll);
+		
+		switch (ld.type) {
+		case 0:
+			((MarkerOptions)oo).icon(
+					BitmapDescriptorFactory.fromResource(R.drawable.postition_marker_lbs));
+			break;
+		case 1:
+			((MarkerOptions)oo).icon(
+				BitmapDescriptorFactory.fromResource(R.drawable.postition_marker_gps));
+			break;
+		default:
+			((MarkerOptions)oo).icon(
+					BitmapDescriptorFactory.fromResource(R.drawable.postition_marker_gps));
+			break;
+		}
+		
 		bdMap.getMap().addOverlay(oo);
 		MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(lll);
 		bdMap.getMap().setMapStatus(u);
@@ -830,6 +849,7 @@ public class LocationActivity extends Activity {
 		public String time;
 		public double longitude;
 		public double laitude;
+		public int type;
 	}
 	
 	public class MyTimerTask extends TimerTask {

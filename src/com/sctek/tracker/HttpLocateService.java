@@ -322,6 +322,7 @@ public class HttpLocateService extends Service{
 					double longtitude = hr.longtitude;
 					double latitude =hr.latitude;
 					int power = hr.power;
+					int dtype = hr.type;
 					
 					Bundle bundle = new Bundle();
 					bundle.putString("clientnum", clientNum);
@@ -330,6 +331,7 @@ public class HttpLocateService extends Service{
 					bundle.putDouble("laitude", latitude);
 					bundle.putInt("power", power);
 					bundle.putString("master", master);
+					bundle.putInt("type", dtype);
 					
 					Message msg = handler.obtainMessage();
 					msg.what = type;

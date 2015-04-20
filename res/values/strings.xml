@@ -70,6 +70,7 @@
     <string name="rebind_no_bind">重绑定为主控失败，设备尚未绑定任何主控，请通过添加设备绑定为主控</string>
     <string name="rebind_pw_error">密码错误，重绑定为主控失败</string>
     <string name="rebind_id_error">设备编号不匹配，重绑定为主控失败，请检查设备SIM卡和输入SIM卡号是否对应</string>
+    <string name="rebind_already_is_master">你已是主控</string>
     <string name="rebind_fail">重新绑定主控失败</string>
     <string name="modify_pw_timeout">修改密码超时</string>
     <string name="modify_pw_success">密码修改成功</string>
@@ -120,6 +121,7 @@
     <string name="location">定位</string>
     <string name="device_list">设备列表</string>
     <string name="input_password">输入新的设备密码:</string>
+    <string name="vice_password_hint">输入主控修改后的设备密码</string>
     <string name="password_title">密码设置</string>
     <string name="new_password_is_empty">新密码不能为空</string>
     <string name="title_activity_tracker_start">TrackerStartActivity</string>

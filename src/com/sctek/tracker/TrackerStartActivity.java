@@ -106,7 +106,8 @@ public class TrackerStartActivity extends Activity {
 		downloadObserver = new DownloadChangeObserver();
 		completeReceiver = new CompleteReceiver();
 		/** register download success broadcast **/
-		registerReceiver(completeReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+		registerReceiver(completeReceiver, 
+				new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 		
 		new Handler().postDelayed(new Runnable() {
 			
@@ -259,7 +260,6 @@ public class TrackerStartActivity extends Activity {
             	  startDownload();
             	  showDownLoadProgressView();
                 }
-				
 			}
 		});
 		
@@ -502,7 +502,7 @@ public class TrackerStartActivity extends Activity {
     	DownloadManager.Request request = new DownloadManager.Request(Uri.parse(ei.url));
 		request.setDestinationInExternalPublicDir(DOWNLOAD_FOLDER, ei.name + ".apk");
 		request.setTitle(getString(R.string.download_notification_title));
-		request.setDescription("meilishuo desc");
+		request.setDescription("sc-tracker update");
 		request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 		request.setVisibleInDownloadsUi(true);
 		// request.allowScanningByMediaScanner();

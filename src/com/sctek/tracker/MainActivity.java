@@ -26,6 +26,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.provider.Telephony;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -173,7 +175,6 @@ public class MainActivity extends Activity {
 			
 			newDevice.name = bundle.getString("name");
 			newDevice.deviceNum = bundle.getString("devicenum");
-			newDevice.imagePath = bundle.getString("imagepath");
 			String pw = bundle.getString("pw");
 			
 			if(newDevice.isMaster.equals("true")) {
@@ -230,20 +231,25 @@ public class MainActivity extends Activity {
 			newDevice.masterNum = bundle.getString("master");
 			newDevice.pw = bundle.getString("pw");
 			
-			Intent intent = new Intent(MainActivity.this, NewDeviceActivity.class);
-			intent.putExtra("initialized", bundle.getString("initialized"));
-			intent.putExtra("count", lvAdapter.getCount());
-			intent.putExtra("pw", newDevice.pw);
+			newDevice.imagePath = getFilesDir()
+					.getAbsolutePath() + "/avatar/" + newDevice.deviceId + ".png";
 			
-			if(selfNumber.equals(newDevice.masterNum)) {
+		if(selfNumber.equals(newDevice.masterNum)) {
 				
 				newDevice.isMaster = "true";
+				
 				showDeviceNumDialog();
 				
 			} else {
 				
 				newDevice.isMaster = bundle.getString("initialized")
 					.equals("1")?"false":"true";
+				
+				Intent intent = new Intent(MainActivity.this, NewDeviceActivity.class);
+				intent.putExtra("initialized", bundle.getString("initialized"));
+				intent.putExtra("id", newDevice.deviceId);
+				intent.putExtra("pw", newDevice.pw);
+				
 				startActivityForResult(intent, DEVICE_INFORMATION_REQUEST);
 			}
 		}
@@ -289,9 +295,9 @@ public class MainActivity extends Activity {
 		hasNumberPref = getSharedPreferences("hasnumber", 
 				Activity.MODE_PRIVATE);
 		
-		selfNumber = getSharedPreferences("mynumber", Activity.MODE_PRIVATE)
+		selfNumber = PreferenceManager.getDefaultSharedPreferences(this)
 				.getString("mynumber", "");
-		
+		Log.e(TAG, "selfNumer:" + selfNumber);
 		
 		servicemanager = new ServiceManager(this);
 		newDevice = new DeviceListViewData();

@@ -38,7 +38,7 @@
            app:border_width="1dp"
            app:border_color="@color/water"
            android:layout_gravity="center_horizontal"
-           android:src="@drawable/ic_postition_marker" />
+           android:src="@drawable/postition_marker_gps" />
        
         <TextView 
            android:id="@+id/select_image_tv_b"

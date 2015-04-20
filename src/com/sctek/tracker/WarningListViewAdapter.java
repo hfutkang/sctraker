@@ -87,6 +87,9 @@ public class WarningListViewAdapter extends BaseAdapter{
 			case Constant.REBIND_ID_ERROR:
 				warn.setText(R.string.rebind_id_error);
 				break;
+			case Constant.REBIND_ALREADY_IS_MASTER:
+				warn.setText(R.string.rebind_already_is_master);
+				break;
 			case Constant.NEW_PASSWORD_SUCCESS:
 				warn.setText(R.string.modify_pw_success);
 				break;
@@ -171,6 +174,9 @@ public class WarningListViewAdapter extends BaseAdapter{
 			break;
 		case Constant.REBIND_ID_ERROR:
 			holder.warning.setText(R.string.rebind_id_error);
+			break;
+		case Constant.REBIND_ALREADY_IS_MASTER:
+			holder.warning.setText(R.string.rebind_already_is_master);
 			break;
 		case Constant.NEW_PASSWORD_SUCCESS:
 			holder.warning.setText(R.string.modify_pw_success);

@@ -121,14 +121,37 @@ public class XmlContentHandler extends DefaultHandler {
 		}
 		else if(!isSmsResponse) {
 			
-			if(nodeName.equals("longitude")) {	
-				httpRes.longtitude = parseLatLng(ch, start);
-//				httpRes.longtitude = 114.0259740000;
+			if(nodeName.equals("type")) {
+				httpRes.type = ch[0] - 48;
+			}
+			else if(nodeName.equals("longitude")) {
+				switch(httpRes.type) {
+				case 1:
+					httpRes.longtitude = parseLatLng(ch, start);
+	//				httpRes.longtitude = 114.0259740000;
+					break;
+				case 0:
+					String lon = new String(ch, start, length);
+					httpRes.longtitude = Double.parseDouble(lon);
+					break;
+					default:
+						break;
+				}
 				nodeName = "";
 			}
 			else if(nodeName.equals("laitude")) {
-				httpRes.latitude = parseLatLng(ch, start);
-//				httpRes.latitude = 22.5460540000;
+				switch(httpRes.type) {
+				case 1:
+					httpRes.latitude = parseLatLng(ch, start);
+	//				httpRes.longtitude = 114.0259740000;
+					break;
+				case 0:
+					String lat = new String(ch, start, length);
+					httpRes.latitude = Double.parseDouble(lat);
+					break;
+					default:
+						break;
+				}
 				nodeName = "";
 			}
 			else if(nodeName.equals("time")) {
@@ -168,6 +191,7 @@ public class XmlContentHandler extends DefaultHandler {
 	
 	public class HttpResData {
 		
+		public int type;
 		public double longtitude;
 		public double latitude;
 		public String time;

@@ -65,6 +65,8 @@ public class Constant {
 	
 	public static final int REBIND_ID_ERROR = 171;
 	
+	public static final int REBIND_ALREADY_IS_MASTER = 175;
+	
 	public static final int NEW_MONITOR_FAILURE = 16;
 	
 	public static final int NEW_MONITOR_SUCCESES = 17;
